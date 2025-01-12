@@ -26,7 +26,7 @@ func NewFuelRepository(DB *gorm.DB) FuelRepository {
 
 func (repo *fuelRepository) GetAllFuels() ([]models.Fuel, int, error) {
 	var fuels []models.Fuel
-	result := repo.DB.Find(&fuels)
+	result := repo.DB.Order("id").Find(&fuels)
 	if result.Error != nil {
 		return nil, http.StatusInternalServerError, result.Error
 	}

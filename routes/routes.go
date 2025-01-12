@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"carbon-api/caches"
 	"carbon-api/config"
 	"carbon-api/controllers"
 	"carbon-api/repositories"
@@ -11,7 +12,8 @@ import (
 func Init(e *echo.Echo) {
 	// Fuel routes
 	fuelRepository := repositories.NewFuelRepository(config.DB)
-	fuelController := controllers.NewFuelController(fuelRepository)
+	fuelCache := caches.NewFuelCache(config.RedisClient)
+	fuelController := controllers.NewFuelController(fuelRepository, fuelCache)
 
 	f := e.Group("/fuels")
 	// TODO: add check auth & check user admin
@@ -31,4 +33,12 @@ func Init(e *echo.Echo) {
 	cf.GET("/:id", carbonFuelController.GetCarbonFuelByID)
 	cf.POST("", carbonFuelController.CreateCarbonFuel)
 	cf.DELETE("/:id", carbonFuelController.DeleteCarbonFuel)
+
+	// Carbon summary routes
+	carbonSummaryRepository := repositories.NewCarbonSummaryRepository(config.DB)
+	carbonSummaryController := controllers.NewCarbonSummaryController(carbonSummaryRepository)
+
+	cs := e.Group("/carbon-summaries")
+	// TODO: add check auth & check user customer
+	cs.GET("", carbonSummaryController.GetCarbonSummary)
 }
