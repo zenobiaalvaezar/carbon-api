@@ -31,6 +31,7 @@ func (repo *carbonFuelRepository) GetAllCarbonFuels(userId int) ([]models.Carbon
 		Joins("JOIN users ON carbon_fuels.user_id = users.id").
 		Joins("JOIN fuels ON carbon_fuels.fuel_id = fuels.id").
 		Where("carbon_fuels.user_id = ?", userId).
+		Order("carbon_fuels.id").
 		Scan(&carbonFuels)
 	if result.Error != nil {
 		return nil, http.StatusInternalServerError, result.Error

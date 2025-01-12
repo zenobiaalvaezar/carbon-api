@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"carbon-api/caches"
 	"carbon-api/config"
 	"carbon-api/controllers"
 	"carbon-api/repositories"
@@ -11,7 +12,8 @@ import (
 func Init(e *echo.Echo) {
 	// Fuel routes
 	fuelRepository := repositories.NewFuelRepository(config.DB)
-	fuelController := controllers.NewFuelController(fuelRepository)
+	fuelCache := caches.NewFuelCache(config.RedisClient)
+	fuelController := controllers.NewFuelController(fuelRepository, fuelCache)
 
 	f := e.Group("/fuels")
 	// TODO: add check auth & check user admin

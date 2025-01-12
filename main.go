@@ -10,8 +10,12 @@ import (
 
 func main() {
 	config.LoadEnv()
+
 	config.ConnectPostgres()
 	defer config.ClosePostgres()
+
+	config.ConnectRedis()
+	defer config.CloseRedis()
 
 	e := echo.New()
 	routes.Init(e)
