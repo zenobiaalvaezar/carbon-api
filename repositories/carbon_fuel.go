@@ -87,7 +87,11 @@ func (repo *carbonFuelRepository) CreateCarbonFuel(carbonFuel models.CarbonFuelR
 		return models.CarbonFuel{}, http.StatusInternalServerError, result.Error
 	}
 
-	// TODO: Update carbon summary
+	// Update carbon summary
+	_, status, err := NewCarbonSummaryRepository(repo.DB).UpdateCarbonSummary(carbonFuel.UserID)
+	if err != nil {
+		return models.CarbonFuel{}, status, err
+	}
 
 	return newCarbonFuel, http.StatusCreated, nil
 }
@@ -111,7 +115,11 @@ func (repo *carbonFuelRepository) DeleteCarbonFuel(id int, userId int) (int, err
 		return http.StatusInternalServerError, result.Error
 	}
 
-	// TODO: Update carbon summary
+	// Update carbon summary
+	_, status, err := NewCarbonSummaryRepository(repo.DB).UpdateCarbonSummary(userId)
+	if err != nil {
+		return status, err
+	}
 
 	return http.StatusOK, nil
 }

@@ -13,5 +13,13 @@ func CalculateTotalConsumption(usageType string, usageAmount float64, price floa
 }
 
 func CalculateEmissionAmount(totalConsumption float64, emissionFactor float64) float64 {
-	return math.Round(totalConsumption*emissionFactor*100) / 100
+	return math.Round((totalConsumption*emissionFactor)*100) / 100
+}
+
+func CalculateTotalEmission(fuelEmission float64, electricEmission float64) float64 {
+	return math.Round((fuelEmission+electricEmission)*100) / 100
+}
+
+func CalculateTotalTree(totalEmission float64) int {
+	return int(math.Round(totalEmission / 34.5))
 }

@@ -31,4 +31,12 @@ func Init(e *echo.Echo) {
 	cf.GET("/:id", carbonFuelController.GetCarbonFuelByID)
 	cf.POST("", carbonFuelController.CreateCarbonFuel)
 	cf.DELETE("/:id", carbonFuelController.DeleteCarbonFuel)
+
+	// Carbon summary routes
+	carbonSummaryRepository := repositories.NewCarbonSummaryRepository(config.DB)
+	carbonSummaryController := controllers.NewCarbonSummaryController(carbonSummaryRepository)
+
+	cs := e.Group("/carbon-summaries")
+	// TODO: add check auth & check user customer
+	cs.GET("", carbonSummaryController.GetCarbonSummary)
 }
