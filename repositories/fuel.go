@@ -26,7 +26,7 @@ func NewFuelRepository(DB *gorm.DB) FuelRepository {
 
 func (repo *fuelRepository) GetAllFuels() ([]models.Fuel, int, error) {
 	var fuels []models.Fuel
-	result := repo.DB.Order("id").Find(&fuels)
+	result := repo.DB.Order("id asc").Find(&fuels)
 	if result.Error != nil {
 		return nil, http.StatusInternalServerError, result.Error
 	}
@@ -41,7 +41,7 @@ func (repo *fuelRepository) GetAllFuels() ([]models.Fuel, int, error) {
 func (repo *fuelRepository) GetFuelByID(id int) (models.Fuel, int, error) {
 	var fuel models.Fuel
 	result := repo.DB.First(&fuel, id)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) || fuel.ID == 0 {
 		return fuel, http.StatusNotFound, errors.New("Fuel not found")
 	}
 
@@ -68,7 +68,7 @@ func (repo *fuelRepository) CreateFuel(fuel models.FuelRequest) (models.Fuel, in
 func (repo *fuelRepository) UpdateFuel(id int, fuel models.FuelRequest) (models.Fuel, int, error) {
 	var existingFuel models.Fuel
 	result := repo.DB.First(&existingFuel, id)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) || existingFuel.ID == 0 {
 		return existingFuel, http.StatusNotFound, errors.New("Fuel not found")
 	}
 
