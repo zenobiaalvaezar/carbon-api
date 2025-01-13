@@ -5,7 +5,6 @@ import (
 	"carbon-api/config"
 	"carbon-api/controllers"
 	"carbon-api/repositories"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -41,4 +40,16 @@ func Init(e *echo.Echo) {
 	cs := e.Group("/carbon-summaries")
 	// TODO: add check auth & check user customer
 	cs.GET("", carbonSummaryController.GetCarbonSummary)
+
+	// Role routes
+	roleRepository := repositories.NewRoleRepository(config.DB)
+	roleController := controllers.NewRoleController(roleRepository)
+
+	r := e.Group("/roles")
+	r.GET("", roleController.GetAllRoles)
+	r.GET("/:id", roleController.GetRoleByID)
+	r.POST("", roleController.CreateRole)
+	r.PUT("/:id", roleController.UpdateRole)
+	r.DELETE("/:id", roleController.DeleteRole)
+
 }
