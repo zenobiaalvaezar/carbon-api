@@ -84,6 +84,15 @@ CREATE TABLE trees (
   FOREIGN KEY (tree_category_id) REFERENCES tree_categories (id)
 );
 
+CREATE TABLE carts (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  tree_id INT NOT NULL,
+  quantity INT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  FOREIGN KEY (tree_id) REFERENCES trees (id)
+);
+
 CREATE TABLE transactions (
   id SERIAL PRIMARY KEY,
   user_id INT NOT NULL,
