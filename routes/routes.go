@@ -41,4 +41,16 @@ func Init(e *echo.Echo) {
 	cs := e.Group("/carbon-summaries")
 	// TODO: add check auth & check user customer
 	cs.GET("", carbonSummaryController.GetCarbonSummary)
+
+	// electric
+	electricRepository := repositories.NewElectricRepository(config.DB)
+	electricCache := caches.NewElectricCache(config.RedisClient)
+	electricController := controllers.NewElectricController(electricRepository, electricCache)
+
+	l := e.Group("/electric")
+	l.GET("", electricController.GetAllElectrics)
+	l.GET("/:id", electricController.GetElectricByID)
+	l.POST("", electricController.CreateElectric)
+	l.PUT("", electricController.UpdateElectric)
+	l.DELETE("/:id", electricController.DeleteElectric)
 }
