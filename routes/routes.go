@@ -4,6 +4,7 @@ import (
 	"carbon-api/caches"
 	"carbon-api/config"
 	"carbon-api/controllers"
+	"carbon-api/middlewares"
 	"carbon-api/repositories"
 
 	"github.com/labstack/echo/v4"
@@ -52,6 +53,24 @@ func Init(e *echo.Echo) {
 	r.POST("", roleController.CreateRole)
 	r.PUT("/:id", roleController.UpdateRole)
 	r.DELETE("/:id", roleController.DeleteRole)
+
+	// Initialize repositories and controllers
+	userRepository := repositories.NewUserRepository(config.DB)
+	userController := controllers.NewUserController(userRepository)
+
+	// Public routes for user
+	e.POST("/register", userController.RegisterUser)
+	e.POST("/login", userController.LoginUser)
+
+	// Protected routes for user profile
+	userGroup := e.Group("/users")
+	userGroup.Use(middlewares.CheckAuth) // Gunakan middleware CheckAuth
+	userGroup.GET("/profile", userController.GetProfile)
+	userGroup.Use(middlewares.CheckAuth)
+	userGroup.POST("/logout", userController.LogoutUser)
+
+	userGroup.Use(middlewares.CheckAuth)
+	userGroup.PUT("/profile", userController.UpdateProfile)
 
 	// electric
 	electricRepository := repositories.NewElectricRepository(config.DB)

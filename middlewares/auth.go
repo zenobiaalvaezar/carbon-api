@@ -6,30 +6,17 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
-
-var JwtMiddleware = middleware.JWTWithConfig(middleware.JWTConfig{
-	SigningKey:  []byte("secret"),
-	Claims:      &jwt.RegisteredClaims{},
-	TokenLookup: "header:Authorization",
-	AuthScheme:  "Bearer",
-	ErrorHandler: func(e error) error {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid Authentication")
-	},
-})
 
 // Check Auth
 func CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		authHeader := c.Request().Header.Get("Authorization")
-
 		if authHeader == "" {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
 		if tokenString == authHeader {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid Authorization header format")
 		}
@@ -45,10 +32,6 @@ func CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid or expired token")
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			c.Set("user", claims)
-		}
-
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
@@ -62,11 +45,40 @@ func CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set("user_id", int(userId))
+		return next(c)
+	}
+}
+
+// Check User Admin
+func CheckUserAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		claims, ok := c.Get("user").(jwt.MapClaims)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid user claims")
+		}
+
+		role, ok := claims["role"].(string)
+		if !ok || role != "Admin" {
+			return echo.NewHTTPError(http.StatusForbidden, "Access restricted to Admin users")
+		}
 
 		return next(c)
 	}
 }
 
-// TODO: Check User Admin
+// Check User Customer
+func CheckUserCustomer(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		claims, ok := c.Get("user").(jwt.MapClaims)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid user claims")
+		}
 
-// TODO: Check User Customer
+		role, ok := claims["role"].(string)
+		if !ok || role != "Customer" {
+			return echo.NewHTTPError(http.StatusForbidden, "Access restricted to Customer users")
+		}
+
+		return next(c)
+	}
+}
