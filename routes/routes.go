@@ -52,4 +52,15 @@ func Init(e *echo.Echo) {
 	r.PUT("/:id", roleController.UpdateRole)
 	r.DELETE("/:id", roleController.DeleteRole)
 
+	// electric
+	electricRepository := repositories.NewElectricRepository(config.DB)
+	electricCache := caches.NewElectricCache(config.RedisClient)
+	electricController := controllers.NewElectricController(electricRepository, electricCache)
+
+	l := e.Group("/electric")
+	l.GET("", electricController.GetAllElectrics)
+	l.GET("/:id", electricController.GetElectricByID)
+	l.POST("", electricController.CreateElectric)
+	l.PUT("", electricController.UpdateElectric)
+	l.DELETE("/:id", electricController.DeleteElectric)
 }
