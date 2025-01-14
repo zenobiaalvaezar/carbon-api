@@ -21,6 +21,7 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 	Phone    string `json:"phone"`
 	Address  string `json:"address"`
+	RoleID   int    `json:"-"`
 }
 
 type RegisterResponse struct {
@@ -39,4 +40,11 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	Token string `json:"token"`
+}
+
+type UpdateProfileRequest struct {
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	Address  string `json:"address"`
+	Password string `json:"password"`
 }
