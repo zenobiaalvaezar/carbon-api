@@ -71,4 +71,7 @@ func Init(e *echo.Echo) {
 	userGroup.Use(middlewares.CheckAuth)
 	userGroup.PUT("/profile", userController.UpdateProfile)
 
+	userGroup.Use(middlewares.CheckAuth)
+	userGroup.PUT("/update-password", userController.UpdatePassword)
+
 }

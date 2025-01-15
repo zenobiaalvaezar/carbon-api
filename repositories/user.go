@@ -15,6 +15,8 @@ type UserRepository interface {
 	UpdateUserProfile(userID int, request models.UpdateProfileRequest) (models.User, int, error)
 	GetUserByEmail(email string) (models.User, int, error)
 	GetUserByID(id int) (models.User, int, error)
+	UpdatePassword(user models.User) error
+	GetRoleNameByID(roleID int) (string, error)
 }
 
 type userRepository struct {
@@ -65,9 +67,6 @@ func (repo *userRepository) UpdateUserProfile(userID int, request models.UpdateP
 	if request.Address != "" {
 		user.Address = request.Address
 	}
-	if request.Password != "" {
-		user.Password = request.Password
-	}
 
 	// Simpan perubahan
 	result = repo.DB.Save(&user)
@@ -96,4 +95,20 @@ func (repo *userRepository) GetUserByID(id int) (models.User, int, error) {
 	}
 
 	return user, http.StatusOK, nil
+}
+func (repo *userRepository) UpdatePassword(user models.User) error {
+	result := repo.DB.Save(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (repo *userRepository) GetRoleNameByID(roleID int) (string, error) {
+	var role models.Role
+	result := repo.DB.First(&role, roleID)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return role.Name, nil
 }
