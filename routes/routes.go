@@ -83,4 +83,12 @@ func Init(e *echo.Echo) {
 	l.POST("", electricController.CreateElectric)
 	l.PUT("/:id", electricController.UpdateElectric)
 	l.DELETE("/:id", electricController.DeleteElectric)
+
+	carbonElectricRepo := repositories.NewCarbonElectricRepository(config.DB)
+	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
+
+	l.GET("/carbon-electric", carbonElectricController.GetAllCarbonElectrics)
+	l.GET("/carbon-electric/:id", carbonElectricController.GetCarbonElectricByID)
+	l.POST("/carbon-electric", carbonElectricController.CreateCarbonElectric)
+	l.DELETE("/carbon-electric/:id", carbonElectricController.DeleteCarbonElectric)
 }

@@ -48,8 +48,16 @@ func (repo *carbonSummaryRepository) UpdateCarbonSummary(userId int) (models.Car
 		fuelEmission += utils.CalculateEmissionAmount(carbonFuel.TotalConsumption, carbonFuel.EmissionFactor)
 	}
 
-	// TODO: Calculate eletric emission amount
+	// Fetch CarbonElectric data to calculate electric emissions
+	carbonElectrics, _, err := NewCarbonElectricRepository(repo.DB).GetAllCarbonElectrics(userId)
+	if err != nil {
+		return models.CarbonSummary{}, http.StatusInternalServerError, err
+	}
+
 	var electricEmission float64
+	for _, carbonElectric := range carbonElectrics {
+		electricEmission += utils.CalculateEmissionAmount(carbonElectric.TotalConsumption, carbonElectric.EmissionFactor)
+	}
 
 	// Calculate total emission amount & tree
 	totalEmission := utils.CalculateTotalEmission(fuelEmission, electricEmission)
