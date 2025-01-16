@@ -94,4 +94,14 @@ func Init(e *echo.Echo) {
 	l.GET("/carbon-electric/:id", carbonElectricController.GetCarbonElectricByID)
 	l.POST("/carbon-electric", carbonElectricController.CreateCarbonElectric)
 	l.DELETE("/carbon-electric/:id", carbonElectricController.DeleteCarbonElectric)
+
+	// cart
+	cartRepository := repositories.NewCartRepository(config.DB)
+	cartController := controllers.NewCartController(cartRepository)
+
+	c := e.Group("/carts")
+	c.Use(middlewares.CheckAuth)
+	c.GET("", cartController.GetAllCart)
+	c.POST("", cartController.AddCart)
+	c.DELETE("/:id", cartController.DeleteCart)
 }
