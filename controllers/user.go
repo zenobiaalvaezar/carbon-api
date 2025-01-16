@@ -87,48 +87,56 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid credentials"})
 	}
 
+	// Generate token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
 		"role_id": user.RoleID,
-		//TODO = ROLE NAme
-		//"role_name": role.Name,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte("secret"))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
 
-	response := models.LoginResponse{
-		Token: tokenString,
+	// Ambil nama role berdasarkan RoleID
+	roleName, err := ctrl.UserRepository.GetRoleNameByID(user.RoleID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to retrieve role name"})
+	}
+
+	response := map[string]interface{}{
+		"role":  roleName,
+		"token": tokenString,
 	}
 
 	return c.JSON(http.StatusOK, response)
+
 }
+
 func (ctrl *UserController) GetProfile(c echo.Context) error {
-	// Ambil klaim dari context
-	claims, ok := c.Get("user").(jwt.MapClaims)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
-	}
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := int(userClaims["user_id"].(float64))
 
-	// Ambil user_id dari klaim
-	userID, ok := claims["user_id"].(float64)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid user ID in token"})
-	}
-
-	// Konversi user_id ke int
-	intUserID := int(userID)
-
-	// Ambil data user dari database
-	user, status, err := ctrl.UserRepository.GetUserByID(intUserID)
+	// Retrieve user details from the database
+	user, status, err := ctrl.UserRepository.GetUserByID(userID)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, user)
+	// Map user to UserProfileResponse
+	response := models.UserProfileResponse{
+		ID:        user.ID,
+		RoleID:    user.RoleID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Address:   user.Address,
+		CreatedAt: user.CreatedAt,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
+
 func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := int(userClaims["user_id"].(float64))
@@ -136,6 +144,11 @@ func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 	var request models.UpdateProfileRequest
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+	}
+
+	// Validasi Email tidak boleh diubah
+	if request.Email != "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Email cannot be updated"})
 	}
 
 	// Hash password baru jika ada
@@ -147,13 +160,22 @@ func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 		request.Password = string(hashedPassword)
 	}
 
-	// Perbarui profil pengguna
-	updatedUser, status, err := ctrl.UserRepository.UpdateUserProfile(userID, request)
+	// Perbarui data pengguna
+	user, status, err := ctrl.UserRepository.UpdateUserProfile(userID, request)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, updatedUser)
+	// Format respons tanpa password
+	response := models.UpdateProfileResponse{
+
+		Name:      user.Name,
+		Phone:     user.Phone,
+		Address:   user.Address,
+		CreatedAt: user.CreatedAt,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (ctrl *UserController) LogoutUser(c echo.Context) error {
@@ -168,8 +190,45 @@ func (ctrl *UserController) LogoutUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token format"})
 	}
 
-	// Simpan token ke blacklist (opsional)
-	// Example: Redis, Database, etc. - Simpan tokenString ke penyimpanan
-
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logout successful"})
+}
+
+func (ctrl *UserController) UpdatePassword(c echo.Context) error {
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := int(userClaims["user_id"].(float64))
+
+	var request models.UpdatePasswordRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+	}
+
+	// Validasi input password
+	if request.CurrentPassword == "" || request.NewPassword == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Both current and new passwords are required"})
+	}
+
+	// Ambil data pengguna berdasarkan ID
+	user, status, err := ctrl.UserRepository.GetUserByID(userID)
+	if err != nil {
+		return c.JSON(status, map[string]string{"message": err.Error()})
+	}
+
+	// Periksa apakah password saat ini cocok
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.CurrentPassword)); err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Current password is incorrect"})
+	}
+
+	// Hash password baru
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to hash new password"})
+	}
+
+	// Perbarui password di database
+	user.Password = string(hashedPassword)
+	if err := ctrl.UserRepository.UpdatePassword(user); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to update password"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Password updated successfully"})
 }

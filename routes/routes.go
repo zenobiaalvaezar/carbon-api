@@ -6,6 +6,7 @@ import (
 	"carbon-api/controllers"
 	"carbon-api/middlewares"
 	"carbon-api/repositories"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -71,4 +72,26 @@ func Init(e *echo.Echo) {
 	userGroup.Use(middlewares.CheckAuth)
 	userGroup.PUT("/profile", userController.UpdateProfile)
 
+	userGroup.Use(middlewares.CheckAuth)
+	userGroup.PUT("/update-password", userController.UpdatePassword)
+
+	// electric
+	electricRepository := repositories.NewElectricRepository(config.DB)
+	electricCache := caches.NewElectricCache(config.RedisClient)
+	electricController := controllers.NewElectricController(electricRepository, electricCache)
+
+	l := e.Group("/electrics")
+	l.GET("", electricController.GetAllElectrics)
+	l.GET("/:id", electricController.GetElectricByID)
+	l.POST("", electricController.CreateElectric)
+	l.PUT("/:id", electricController.UpdateElectric)
+	l.DELETE("/:id", electricController.DeleteElectric)
+
+	carbonElectricRepo := repositories.NewCarbonElectricRepository(config.DB)
+	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
+
+	l.GET("/carbon-electric", carbonElectricController.GetAllCarbonElectrics)
+	l.GET("/carbon-electric/:id", carbonElectricController.GetCarbonElectricByID)
+	l.POST("/carbon-electric", carbonElectricController.CreateCarbonElectric)
+	l.DELETE("/carbon-electric/:id", carbonElectricController.DeleteCarbonElectric)
 }
