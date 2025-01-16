@@ -81,7 +81,7 @@ func (r *cartRepository) AddCart(cart models.AddCartRequest) (int, error) {
 func (r *cartRepository) DeleteCart(cartID int) (int, error) {
 	// check if cart exists
 	var existingCart models.Cart
-	r.DB.Where("cart_id = ?", cartID).First(&existingCart)
+	r.DB.Where("id = ?", cartID).First(&existingCart)
 	if existingCart.ID == 0 {
 		return http.StatusNotFound, errors.New("Cart not found")
 	}
