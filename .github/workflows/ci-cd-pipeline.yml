@@ -1,0 +1,52 @@
+name: GoLang CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies and run tests
+        run: |
+          go mod tidy
+          go test ./...
+
+      - name: Build Docker image
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/carbon-api:$GITHUB_SHA .
+
+      - name: Push Docker image to GCR
+        run: |
+          echo ${{ secrets.GCP_SA_KEY }} | gcloud auth activate-service-account --key-file=-
+          gcloud auth configure-docker
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/carbon-api:$GITHUB_SHA
+
+      - name: Deploy to GCP App Engine
+        run: |
+          gcloud app browse || gcloud app deploy --quiet
+
