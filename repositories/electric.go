@@ -40,7 +40,7 @@ func (repo *electricRepository) FindByID(id int) (*models.Electric, error) {
 func (repo *electricRepository) FindAll() ([]models.Electric, error) {
 	var electrics []models.Electric
 
-	err := repo.db.Where("deleted_at IS NULL").Find(&electrics).Error
+	err := repo.db.Find(&electrics).Error
 	return electrics, err
 }
 

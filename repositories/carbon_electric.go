@@ -64,11 +64,13 @@ func (repo *carbonElectricRepository) CreateCarbonElectric(carbonElectric models
 
 	newCarbonElectric := models.CarbonElectric{
 		UserID:           carbonElectric.UserID,
+		ElectricID:       carbonElectric.ElectricID,
 		UsageType:        carbonElectric.UsageType,
 		UsageAmount:      carbonElectric.UsageAmount,
 		TotalConsumption: totalConsumption,
 		EmissionFactor:   carbonElectric.EmissionFactor,
 		EmissionAmount:   emissionAmount,
+		Price:            carbonElectric.Price,
 	}
 
 	result := repo.DB.Create(&newCarbonElectric)
