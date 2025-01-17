@@ -1,4 +1,50 @@
 definitions:
+  models.CarbonElectricRequest:
+    properties:
+      electric_id:
+        type: integer
+      emission_factor:
+        type: number
+      price:
+        type: number
+      usage_amount:
+        type: number
+      usage_type:
+        enum:
+        - consumption
+        - rupiah
+        type: string
+      user_id:
+        type: integer
+    required:
+    - electric_id
+    - emission_factor
+    - price
+    - usage_amount
+    - usage_type
+    - user_id
+    type: object
+  models.CarbonElectricResponse:
+    properties:
+      emission_amount:
+        type: number
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      total_consumption:
+        type: number
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
   models.Electric:
     properties:
       emission_factor:
@@ -13,6 +59,142 @@ definitions:
 info:
   contact: {}
 paths:
+  /carbon-electrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of carbon electric entries for the logged-in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of carbon electric entries
+          schema:
+            items:
+              $ref: '#/definitions/models.CarbonElectricResponse'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all carbon electrics
+      tags:
+      - CarbonElectrics
+    post:
+      consumes:
+      - application/json
+      description: Add a new carbon electric entry for the logged-in user
+      parameters:
+      - description: Carbon Electric request body
+        in: body
+        name: carbonElectricRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarbonElectricRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created carbon electric entry
+          schema:
+            $ref: '#/definitions/models.CarbonElectricResponse'
+        "400":
+          description: Invalid request payload or usage type/amount
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new carbon electric entry
+      tags:
+      - CarbonElectrics
+  /carbon-electrics/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific carbon electric entry by its unique ID
+      parameters:
+      - description: Carbon Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted carbon electric entry
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid carbon electric ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Carbon electric not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a carbon electric entry
+      tags:
+      - CarbonElectrics
+    get:
+      consumes:
+      - application/json
+      description: Fetch details of a specific carbon electric entry by its unique
+        ID
+      parameters:
+      - description: Carbon Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Carbon electric entry details
+          schema:
+            $ref: '#/definitions/models.CarbonElectricResponse'
+        "400":
+          description: Invalid carbon electric ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Carbon electric not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a carbon electric entry by ID
+      tags:
+      - CarbonElectrics
   /electrics:
     get:
       consumes:

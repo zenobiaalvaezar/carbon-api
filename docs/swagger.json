@@ -4,6 +4,210 @@
         "contact": {}
     },
     "paths": {
+        "/carbon-electrics": {
+            "get": {
+                "description": "Retrieve a list of carbon electric entries for the logged-in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonElectrics"
+                ],
+                "summary": "Get all carbon electrics",
+                "responses": {
+                    "200": {
+                        "description": "List of carbon electric entries",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.CarbonElectricResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new carbon electric entry for the logged-in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonElectrics"
+                ],
+                "summary": "Create a new carbon electric entry",
+                "parameters": [
+                    {
+                        "description": "Carbon Electric request body",
+                        "name": "carbonElectricRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonElectricRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created carbon electric entry",
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonElectricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or usage type/amount",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/carbon-electrics/{id}": {
+            "get": {
+                "description": "Fetch details of a specific carbon electric entry by its unique ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonElectrics"
+                ],
+                "summary": "Get a carbon electric entry by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Carbon Electric ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carbon electric entry details",
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonElectricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid carbon electric ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Carbon electric not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a specific carbon electric entry by its unique ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonElectrics"
+                ],
+                "summary": "Delete a carbon electric entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Carbon Electric ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted carbon electric entry",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid carbon electric ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Carbon electric not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/electrics": {
             "get": {
                 "description": "Retrieve a list of all electric records",
@@ -236,6 +440,73 @@
         }
     },
     "definitions": {
+        "models.CarbonElectricRequest": {
+            "type": "object",
+            "required": [
+                "electric_id",
+                "emission_factor",
+                "price",
+                "usage_amount",
+                "usage_type",
+                "user_id"
+            ],
+            "properties": {
+                "electric_id": {
+                    "type": "integer"
+                },
+                "emission_factor": {
+                    "type": "number"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "usage_amount": {
+                    "type": "number"
+                },
+                "usage_type": {
+                    "type": "string",
+                    "enum": [
+                        "consumption",
+                        "rupiah"
+                    ]
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CarbonElectricResponse": {
+            "type": "object",
+            "properties": {
+                "emission_amount": {
+                    "type": "number"
+                },
+                "emission_factor": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "total_consumption": {
+                    "type": "number"
+                },
+                "usage_amount": {
+                    "type": "number"
+                },
+                "usage_type": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Electric": {
             "type": "object",
             "properties": {
