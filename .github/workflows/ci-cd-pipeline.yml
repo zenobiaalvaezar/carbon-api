@@ -40,7 +40,7 @@ jobs:
         run: |
           docker buildx create --use
           docker buildx version
- 
+
       - name: Build Docker image
         run: |
           docker build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA .
@@ -54,4 +54,3 @@ jobs:
       - name: Deploy to GCP App Engine
         run: |
           gcloud app browse || gcloud app deploy --quiet
-
