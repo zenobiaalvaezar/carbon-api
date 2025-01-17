@@ -38,7 +38,7 @@ jobs:
 
       - name: Check secrets
         run: |
-          echo "GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}"
+          echo "GOOGLE_PROJECT_ID: persuasive-axe-317613"
           echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
         
       - name: Debug environment
@@ -55,13 +55,30 @@ jobs:
         run: |
           docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA .
 
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # Configure Google Cloud CLI
+      - name: Set up gcloud CLI
+        run: |
+          gcloud --quiet config set project persuasive-axe-317613
+          gcloud --quiet config set compute/region us-central1
+          gcloud --quiet config set compute/zone us-central1-a
+
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy api \
+            --image gcr.io/persuasive-axe-317613/carbon-api:latest \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated
+
+      - name: Build Docker image
+        run: |
+          docker build -t gcr.io/persuasive-axe-317613/carbon-api:latest .
+        
       - name: Push Docker image to GCR
         run: |
-          echo ${{ secrets.GCP_SA_KEY }} | base64 --decode > /tmp/gcp-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-          gcloud auth configure-docker
-          docker push gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA
-
-      - name: Deploy to GCP App Engine
-        run: |
-          gcloud app browse || gcloud app deploy --quiet
+          docker push gcr.io/persuasive-axe-317613/carbon-api:latest
