@@ -3,7 +3,7 @@ name: GoLang CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - main 
   pull_request:
     branches:
       - main
@@ -36,6 +36,11 @@ jobs:
           go mod tidy
           go test ./...
 
+      - name: Check secrets
+        run: |
+          echo "GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}"
+          echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
+        
       - name: Debug environment
         run: |
           echo $SHELL
@@ -50,19 +55,12 @@ jobs:
         run: |
           docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA .
 
-      - name: Decode service account key (if base64 encoded)
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > decoded_key.json || exit 1
-
-      - name: Login to Google Container Registry (GCR)
-        run: |
-          gcloud auth activate-service-account --key-file=decoded_key.json
-          echo "Logged into GCR."
-
       - name: Push Docker image to GCR
         run: |
+          echo "${{ secrets.GCP_SA_KEY }}" | gcloud auth activate-service-account --key-file=- --account="github-actions-sa@persuasive-axe-317613.iam.gserviceaccount.com"
+          gcloud auth configure-docker
           docker push gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA
 
       - name: Deploy to GCP App Engine
         run: |
-          gcloud app browse || gcloud app deploy --quiet --stop-previous-version
+          gcloud app browse || gcloud app deploy --quiet
