@@ -55,11 +55,12 @@ jobs:
         run: |
           docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA .
 
+      - name: Login to Google Container Registry (GCR)
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin gcr.io
+
       - name: Push Docker image to GCR
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | gcloud auth activate-service-account --key-file=. --account=github-actions-sa@persuasive-axe-317613.iam.gserviceaccount.com
-
-          gcloud auth configure-docker
           docker push gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA
 
       - name: Deploy to GCP App Engine
