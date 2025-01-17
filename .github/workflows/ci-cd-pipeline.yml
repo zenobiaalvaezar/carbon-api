@@ -3,7 +3,7 @@ name: GoLang CI/CD Pipeline
 on:
   push:
     branches:
-      - main 
+      - main
   pull_request:
     branches:
       - main
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "GOOGLE_PROJECT_ID: persuasive-axe-317613"
           echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
-        
+
       - name: Debug environment
         run: |
           echo $SHELL
@@ -51,18 +51,14 @@ jobs:
           docker buildx create --use
           docker buildx version
 
-      - name: Build Docker image
-        run: |
-          docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:latest .
-
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Push Docker image to GCR
+      - name: Build and Push Docker image
         run: |
-          docker push gcr.io/persuasive-axe-317613/carbon-api:latest
+          docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:latest --push .
 
       - name: Set up gcloud CLI
         run: |
