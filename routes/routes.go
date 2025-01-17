@@ -90,10 +90,11 @@ func Init(e *echo.Echo) {
 	carbonElectricRepo := repositories.NewCarbonElectricRepository(config.DB)
 	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
 
-	l.GET("/carbon-electric", carbonElectricController.GetAllCarbonElectrics)
-	l.GET("/carbon-electric/:id", carbonElectricController.GetCarbonElectricByID)
-	l.POST("/carbon-electric", carbonElectricController.CreateCarbonElectric)
-	l.DELETE("/carbon-electric/:id", carbonElectricController.DeleteCarbonElectric)
+	ce := e.Group("/carbon-electrics")
+	ce.GET("", carbonElectricController.GetAllCarbonElectrics)
+	ce.GET("/:id", carbonElectricController.GetCarbonElectricByID)
+	ce.POST("", carbonElectricController.CreateCarbonElectric)
+	ce.DELETE("/:id", carbonElectricController.DeleteCarbonElectric)
 
 	// cart
 	cartRepository := repositories.NewCartRepository(config.DB)
