@@ -68,7 +68,7 @@ jobs:
 
       - name: Deploy to Google Cloud Run
         run: |
-          gcloud run deploy gcr.io/persuasive-axe-317613/carbon-api \
+          gcloud run deploy carbon-api \
             --image gcr.io/persuasive-axe-317613/carbon-api:latest \
             --platform managed \
             --region us-central1 \
