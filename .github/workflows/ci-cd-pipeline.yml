@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA .
+          docker buildx build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA . --push
 
       - name: Push Docker image to GCR
         run: |
