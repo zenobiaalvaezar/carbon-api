@@ -85,6 +85,23 @@ definitions:
       user_name:
         type: string
     type: object
+  models.CarbonSummaryResponse:
+    properties:
+      electric_emission:
+        type: number
+      fuel_emission:
+        type: number
+      total_emission:
+        type: number
+      total_tree:
+        type: integer
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
   models.Electric:
     properties:
       emission_factor:
@@ -487,6 +504,34 @@ paths:
       summary: Get carbon fuel by ID
       tags:
       - CarbonFuels
+  /carbon-summary:
+    get:
+      consumes:
+      - application/json
+      description: Get the carbon summary for a specific user, including fuel and
+        electric emissions, total emissions, and total trees equivalent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CarbonSummaryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get carbon summary
+      tags:
+      - CarbonSummary
   /electrics:
     get:
       consumes:

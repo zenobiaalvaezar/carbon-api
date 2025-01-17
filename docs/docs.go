@@ -414,6 +414,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/carbon-summary": {
+            "get": {
+                "description": "Get the carbon summary for a specific user, including fuel and electric emissions, total emissions, and total trees equivalent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonSummary"
+                ],
+                "summary": "Get carbon summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonSummaryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/electrics": {
             "get": {
                 "description": "Retrieve a list of all electric records",
@@ -1573,6 +1614,32 @@ const docTemplate = `{
                 },
                 "usage_type": {
                     "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CarbonSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "electric_emission": {
+                    "type": "number"
+                },
+                "fuel_emission": {
+                    "type": "number"
+                },
+                "total_emission": {
+                    "type": "number"
+                },
+                "total_tree": {
+                    "type": "integer"
                 },
                 "user_email": {
                     "type": "string"
