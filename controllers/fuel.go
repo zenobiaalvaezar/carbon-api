@@ -19,6 +19,15 @@ func NewFuelController(fuelRepository repositories.FuelRepository, fuelCache cac
 	return &FuelController{fuelRepository, fuelCache}
 }
 
+// GetAllFuels godoc
+// @Summary Get all fuels
+// @Description Retrieve a list of all fuels from cache, if not found, retrieve from database and cache it
+// @Tags Fuels
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Fuel
+// @Failure 500 {object} map[string]string
+// @Router /fuels [get]
 func (ctrl *FuelController) GetAllFuels(c echo.Context) error {
 	var fuels []models.Fuel
 	var status int
@@ -44,6 +53,18 @@ func (ctrl *FuelController) GetAllFuels(c echo.Context) error {
 	return c.JSON(status, fuels)
 }
 
+// GetFuelByID godoc
+// @Summary Get a fuel by ID
+// @Description Retrieve a specific fuel by ID from cache, if not found, retrieve from database and cache it
+// @Tags Fuels
+// @Accept json
+// @Produce json
+// @Param id path int true "Fuel ID"
+// @Success 200 {object} models.Fuel
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /fuels/{id} [get]
 func (ctrl *FuelController) GetFuelByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -74,6 +95,17 @@ func (ctrl *FuelController) GetFuelByID(c echo.Context) error {
 	return c.JSON(status, fuel)
 }
 
+// CreateFuel godoc
+// @Summary Create a new fuel
+// @Description Create a new fuel record and store it in both the database and cache
+// @Tags Fuels
+// @Accept json
+// @Produce json
+// @Param body body models.FuelRequest true "Fuel Request"
+// @Success 201 {object} models.Fuel
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /fuels [post]
 func (ctrl *FuelController) CreateFuel(c echo.Context) error {
 	var fuelRequest models.FuelRequest
 	if err := c.Bind(&fuelRequest); err != nil {
@@ -99,6 +131,19 @@ func (ctrl *FuelController) CreateFuel(c echo.Context) error {
 	return c.JSON(status, fuel)
 }
 
+// UpdateFuel godoc
+// @Summary Update an existing fuel
+// @Description Update a specific fuel by ID in both the database and cache
+// @Tags Fuels
+// @Accept json
+// @Produce json
+// @Param id path int true "Fuel ID"
+// @Param body body models.FuelRequest true "Fuel Request"
+// @Success 200 {object} models.Fuel
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /fuels/{id} [put]
 func (ctrl *FuelController) UpdateFuel(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -129,6 +174,18 @@ func (ctrl *FuelController) UpdateFuel(c echo.Context) error {
 	return c.JSON(status, fuel)
 }
 
+// DeleteFuel godoc
+// @Summary Delete a fuel
+// @Description Delete a specific fuel by ID from both the database and cache
+// @Tags Fuels
+// @Accept json
+// @Produce json
+// @Param id path int true "Fuel ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /fuels/{id} [delete]
 func (ctrl *FuelController) DeleteFuel(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

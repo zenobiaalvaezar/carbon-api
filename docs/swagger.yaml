@@ -56,6 +56,34 @@ definitions:
       province:
         type: string
     type: object
+  models.Fuel:
+    properties:
+      category:
+        type: string
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      unit:
+        type: string
+    type: object
+  models.FuelRequest:
+    properties:
+      category:
+        type: string
+      emission_factor:
+        type: number
+      name:
+        type: string
+      price:
+        type: number
+      unit:
+        type: string
+    type: object
   models.LoginRequest:
     properties:
       email:
@@ -446,6 +474,188 @@ paths:
       summary: Update an electric record by ID
       tags:
       - Electrics
+  /fuels:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all fuels from cache, if not found, retrieve
+        from database and cache it
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Fuel'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all fuels
+      tags:
+      - Fuels
+    post:
+      consumes:
+      - application/json
+      description: Create a new fuel record and store it in both the database and
+        cache
+      parameters:
+      - description: Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FuelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new fuel
+      tags:
+      - Fuels
+  /fuels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific fuel by ID from both the database and cache
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a fuel
+      tags:
+      - Fuels
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific fuel by ID from cache, if not found, retrieve
+        from database and cache it
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a fuel by ID
+      tags:
+      - Fuels
+    put:
+      consumes:
+      - application/json
+      description: Update a specific fuel by ID in both the database and cache
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FuelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing fuel
+      tags:
+      - Fuels
   /roles:
     get:
       consumes:

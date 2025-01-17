@@ -449,6 +449,276 @@ const docTemplate = `{
                 }
             }
         },
+        "/fuels": {
+            "get": {
+                "description": "Retrieve a list of all fuels from cache, if not found, retrieve from database and cache it",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fuels"
+                ],
+                "summary": "Get all fuels",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Fuel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new fuel record and store it in both the database and cache",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fuels"
+                ],
+                "summary": "Create a new fuel",
+                "parameters": [
+                    {
+                        "description": "Fuel Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FuelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Fuel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/fuels/{id}": {
+            "get": {
+                "description": "Retrieve a specific fuel by ID from cache, if not found, retrieve from database and cache it",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fuels"
+                ],
+                "summary": "Get a fuel by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Fuel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Fuel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a specific fuel by ID in both the database and cache",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fuels"
+                ],
+                "summary": "Update an existing fuel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Fuel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fuel Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FuelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Fuel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a specific fuel by ID from both the database and cache",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fuels"
+                ],
+                "summary": "Delete a fuel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Fuel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "description": "Retrieve a list of all roles",
@@ -1072,6 +1342,49 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "province": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Fuel": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "emission_factor": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "unit": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.FuelRequest": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "emission_factor": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "unit": {
                     "type": "string"
                 }
             }
