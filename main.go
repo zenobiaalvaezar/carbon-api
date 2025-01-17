@@ -22,7 +22,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = os.Getenv("API_PORT")
+		port = os.Getenv("8080")
 	}
 	e.Logger.Fatal(e.Start(":" + port))
 }

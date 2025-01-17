@@ -43,8 +43,9 @@ jobs:
 
       - name: Debug environment
         run: |
-          echo $SHELL
-          echo $GITHUB_SHA
+          echo "Current shell: $SHELL"
+          echo "Commit SHA: $GITHUB_SHA"
+          echo "GO version: $(go version)"
 
       - name: Set up Docker Buildx
         run: |
@@ -56,9 +57,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Build and Push Docker image
+      - name: Build and Push Docker image to GCR
         run: |
-          docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:latest .
+          docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:latest --push .
 
       - name: Set up gcloud CLI
         run: |

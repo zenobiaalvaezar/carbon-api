@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  redis:
+    image: redis:latest
+    container_name: carbon-api_redis_1
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: carbon-api_app_1
+    depends_on:
+      - redis
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: carbon-api_redis_1
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DATABASE: 0
