@@ -36,11 +36,6 @@ jobs:
           go mod tidy
           go test ./...
 
-      - name: Check secrets
-        run: |
-          echo "GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}"
-          echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
-
       - name: Debug environment
         run: |
           echo $SHELL
@@ -57,13 +52,12 @@ jobs:
 
       - name: Decode service account key (if base64 encoded)
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > decoded_key.json
-          DECODED_KEY_CONTENT=$(cat decoded_key.json)
-          echo "$DECODED_KEY_CONTENT" > decoded_key.json 
+          echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > decoded_key.json || exit 1
 
       - name: Login to Google Container Registry (GCR)
         run: |
-          echo "$DECODED_KEY_CONTENT" | docker login -u _json_key --password-stdin gcr.io
+          gcloud auth activate-service-account --key-file=decoded_key.json
+          echo "Logged into GCR."
 
       - name: Push Docker image to GCR
         run: |
@@ -71,4 +65,4 @@ jobs:
 
       - name: Deploy to GCP App Engine
         run: |
-          gcloud app browse || gcloud app deploy --quiet
+          gcloud app browse || gcloud app deploy --quiet --stop-previous-version
