@@ -36,6 +36,11 @@ jobs:
           go mod tidy
           go test ./...
 
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use
+          docker buildx version
+
       - name: Build Docker image
         run: |
           docker buildx build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA . --push
