@@ -40,6 +40,11 @@ jobs:
         run: |
           echo "GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}"
           echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
+        
+      - name: Debug environment
+        run: |
+          echo $SHELL
+          echo $GITHUB_SHA
 
       - name: Set up Docker Buildx
         run: |
@@ -52,7 +57,7 @@ jobs:
 
       - name: Push Docker image to GCR
         run: |
-          echo ${{ secrets.GCP_SA_KEY }} | gcloud auth activate-service-account --key-file=-
+          echo "${{ secrets.GCP_SA_KEY }}" | gcloud auth activate-service-account --key-file=-
           gcloud auth configure-docker
           docker push gcr.io/persuasive-axe-317613/carbon-api:$GITHUB_SHA
 
