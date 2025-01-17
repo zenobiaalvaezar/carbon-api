@@ -45,6 +45,46 @@ definitions:
       user_name:
         type: string
     type: object
+  models.CarbonFuelRequest:
+    properties:
+      fuel_id:
+        type: integer
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.CarbonFuelResponse:
+    properties:
+      emission_amount:
+        type: number
+      emission_factor:
+        type: number
+      fuel_id:
+        type: integer
+      fuel_name:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      total_consumption:
+        type: number
+      unit:
+        type: string
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
   models.Electric:
     properties:
       emission_factor:
@@ -318,6 +358,135 @@ paths:
       summary: Get a carbon electric entry by ID
       tags:
       - CarbonElectrics
+  /carbon-fuels:
+    get:
+      consumes:
+      - application/json
+      description: Get all carbon fuels for a specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CarbonFuelResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all carbon fuels
+      tags:
+      - CarbonFuels
+    post:
+      consumes:
+      - application/json
+      description: Create a new carbon fuel entry for a user with specific fuel data
+      parameters:
+      - description: Create Carbon Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarbonFuelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CarbonFuelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new carbon fuel entry
+      tags:
+      - CarbonFuels
+  /carbon-fuels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a carbon fuel entry by ID for a specific user
+      parameters:
+      - description: Carbon Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a carbon fuel entry
+      tags:
+      - CarbonFuels
+    get:
+      consumes:
+      - application/json
+      description: Get a specific carbon fuel by its ID
+      parameters:
+      - description: Carbon Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CarbonFuelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get carbon fuel by ID
+      tags:
+      - CarbonFuels
   /electrics:
     get:
       consumes:

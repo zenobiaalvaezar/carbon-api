@@ -219,6 +219,201 @@ const docTemplate = `{
                 }
             }
         },
+        "/carbon-fuels": {
+            "get": {
+                "description": "Get all carbon fuels for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonFuels"
+                ],
+                "summary": "Get all carbon fuels",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.CarbonFuelResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new carbon fuel entry for a user with specific fuel data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonFuels"
+                ],
+                "summary": "Create a new carbon fuel entry",
+                "parameters": [
+                    {
+                        "description": "Create Carbon Fuel Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonFuelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonFuelResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/carbon-fuels/{id}": {
+            "get": {
+                "description": "Get a specific carbon fuel by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonFuels"
+                ],
+                "summary": "Get carbon fuel by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Carbon Fuel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CarbonFuelResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a carbon fuel entry by ID for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarbonFuels"
+                ],
+                "summary": "Delete a carbon fuel entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Carbon Fuel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/electrics": {
             "get": {
                 "description": "Retrieve a list of all electric records",
@@ -1311,6 +1506,67 @@ const docTemplate = `{
                 },
                 "total_consumption": {
                     "type": "number"
+                },
+                "usage_amount": {
+                    "type": "number"
+                },
+                "usage_type": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CarbonFuelRequest": {
+            "type": "object",
+            "properties": {
+                "fuel_id": {
+                    "type": "integer"
+                },
+                "usage_amount": {
+                    "type": "number"
+                },
+                "usage_type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CarbonFuelResponse": {
+            "type": "object",
+            "properties": {
+                "emission_amount": {
+                    "type": "number"
+                },
+                "emission_factor": {
+                    "type": "number"
+                },
+                "fuel_id": {
+                    "type": "integer"
+                },
+                "fuel_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "total_consumption": {
+                    "type": "number"
+                },
+                "unit": {
+                    "type": "string"
                 },
                 "usage_amount": {
                     "type": "number"
