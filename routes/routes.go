@@ -7,9 +7,23 @@ import (
 	"carbon-api/middlewares"
 	"carbon-api/repositories"
 
+	_ "carbon-api/docs"
+
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Carbon API
+// @version 1.0
+// @description This is the API for managing carbon ecosystem.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @host localhost:8080
+// @BasePath /
 func Init(e *echo.Echo) {
 	// Fuel routes
 	fuelRepository := repositories.NewFuelRepository(config.DB)
@@ -105,4 +119,6 @@ func Init(e *echo.Echo) {
 	c.GET("", cartController.GetAllCart)
 	c.POST("", cartController.AddCart)
 	c.DELETE("/:id", cartController.DeleteCart)
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

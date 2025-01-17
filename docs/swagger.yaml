@@ -1,0 +1,172 @@
+definitions:
+  models.Electric:
+    properties:
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      price:
+        type: number
+      province:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /electrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all electric records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of electrics
+          schema:
+            items:
+              $ref: '#/definitions/models.Electric'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all electric data
+      tags:
+      - Electrics
+    post:
+      consumes:
+      - application/json
+      description: Add a new electric record to the database
+      parameters:
+      - description: Electric data
+        in: body
+        name: electric
+        required: true
+        schema:
+          $ref: '#/definitions/models.Electric'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created electric
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new electric record
+      tags:
+      - Electrics
+  /electrics/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an electric record from the database
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Electric deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid electric ID
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an electric record by ID
+      tags:
+      - Electrics
+    get:
+      consumes:
+      - application/json
+      description: Fetch an electric record using its unique ID
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Electric details
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid electric ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Electric not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get an electric record by ID
+      tags:
+      - Electrics
+    put:
+      consumes:
+      - application/json
+      description: Modify the details of an existing electric record
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated electric data
+        in: body
+        name: electric
+        required: true
+        schema:
+          $ref: '#/definitions/models.Electric'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated electric
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid electric ID or payload
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update an electric record by ID
+      tags:
+      - Electrics
+swagger: "2.0"

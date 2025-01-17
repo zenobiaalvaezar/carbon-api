@@ -1,0 +1,257 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/electrics": {
+            "get": {
+                "description": "Retrieve a list of all electric records",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Electrics"
+                ],
+                "summary": "Get all electric data",
+                "responses": {
+                    "200": {
+                        "description": "List of electrics",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Electric"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new electric record to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Electrics"
+                ],
+                "summary": "Create a new electric record",
+                "parameters": [
+                    {
+                        "description": "Electric data",
+                        "name": "electric",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Electric"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created electric",
+                        "schema": {
+                            "$ref": "#/definitions/models.Electric"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/electrics/{id}": {
+            "get": {
+                "description": "Fetch an electric record using its unique ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Electrics"
+                ],
+                "summary": "Get an electric record by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Electric ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Electric details",
+                        "schema": {
+                            "$ref": "#/definitions/models.Electric"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid electric ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Electric not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Modify the details of an existing electric record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Electrics"
+                ],
+                "summary": "Update an electric record by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Electric ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated electric data",
+                        "name": "electric",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Electric"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated electric",
+                        "schema": {
+                            "$ref": "#/definitions/models.Electric"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid electric ID or payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove an electric record from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Electrics"
+                ],
+                "summary": "Delete an electric record by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Electric ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Electric deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid electric ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Electric": {
+            "type": "object",
+            "properties": {
+                "emission_factor": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "province": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
