@@ -41,9 +41,10 @@ jobs:
           docker buildx create --use
           docker buildx version
 
-      - name: Build Docker image
+ 
+      - name: Build Docker image (**fix applied here**):
         run: |
-          docker buildx build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA . --push
+          docker buildx build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA .  # Added '.' at the end to specify the context
 
       - name: Push Docker image to GCR
         run: |
