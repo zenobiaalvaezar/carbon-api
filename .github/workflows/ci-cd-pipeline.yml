@@ -38,13 +38,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/carbon-api:$GITHUB_SHA .
+          docker build -t gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA .
 
       - name: Push Docker image to GCR
         run: |
           echo ${{ secrets.GCP_SA_KEY }} | gcloud auth activate-service-account --key-file=-
           gcloud auth configure-docker
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/carbon-api:$GITHUB_SHA
+          docker push gcr.io/${{ secrets.GOOGLE_PROJECT_ID }}/carbon-api:$GITHUB_SHA
 
       - name: Deploy to GCP App Engine
         run: |
