@@ -56,6 +56,18 @@ definitions:
       province:
         type: string
     type: object
+  models.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.RoleRequest:
+    properties:
+      name:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -351,4 +363,183 @@ paths:
       summary: Update an electric record by ID
       tags:
       - Electrics
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of roles
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Add a new role to the system
+      parameters:
+      - description: Role request payload
+        in: body
+        name: roleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created role
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new role
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted role
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of a specific role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role details
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a role by ID
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Role update request payload
+        in: body
+        name: roleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated role
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid role ID or request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a role
+      tags:
+      - Roles
 swagger: "2.0"
