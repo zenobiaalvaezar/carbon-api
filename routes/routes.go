@@ -101,6 +101,7 @@ func Init(e *echo.Echo) {
 	l.PUT("/:id", electricController.UpdateElectric)
 	l.DELETE("/:id", electricController.DeleteElectric)
 
+	
 	carbonElectricRepo := repositories.NewCarbonElectricRepository(config.DB)
 	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
 
