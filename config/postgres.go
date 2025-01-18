@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -14,13 +13,7 @@ import (
 var DB *gorm.DB
 
 func ConnectPostgres() {
-	dbuser := os.Getenv("POSTGRES_USERNAME")
-	dbpass := os.Getenv("POSTGRES_PASSWORD")
-	dbhost := os.Getenv("POSTGRES_HOST")
-	dbname := os.Getenv("POSTGRES_DATABASE")
-	dbport := os.Getenv("POSTGRES_PORT")
-
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", dbhost, dbuser, dbpass, dbname, dbport)
+	dsn := os.Getenv("DATABASE_URL")
 
 	// dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=require&PreferSimpleProtocol=true&statement_cache_mode=describe", dbuser, dbpass, dbhost, dbport, dbname)
 
