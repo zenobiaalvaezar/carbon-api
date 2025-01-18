@@ -23,6 +23,17 @@ func NewUserController(userRepository repositories.UserRepository) *UserControll
 	return &UserController{userRepository}
 }
 
+// RegisterUser godoc
+// @Summary Register a new user
+// @Description Register a new user with name, email, and password
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.RegisterRequest true "Register User"
+// @Success 201 {object} models.RegisterResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/register [post]
 func (ctrl *UserController) RegisterUser(c echo.Context) error {
 	var request models.RegisterRequest
 	if err := c.Bind(&request); err != nil {
@@ -68,6 +79,17 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 	return c.JSON(status, response)
 }
 
+// LoginUser godoc
+// @Summary Login user
+// @Description Authenticate a user and return a JWT token
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.LoginRequest true "Login User"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /users/login [post]
 func (ctrl *UserController) LoginUser(c echo.Context) error {
 	var request models.LoginRequest
 	if err := c.Bind(&request); err != nil {
@@ -113,6 +135,14 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 
 }
 
+// GetProfile godoc
+// @Summary Get user profile
+// @Description Retrieve the profile information of the authenticated user
+// @Tags Users
+// @Produce json
+// @Success 200 {object} models.UserProfileResponse
+// @Failure 401 {object} map[string]string
+// @Router /users/profile [get]
 func (ctrl *UserController) GetProfile(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := int(userClaims["user_id"].(float64))
@@ -137,6 +167,17 @@ func (ctrl *UserController) GetProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// UpdateProfile godoc
+// @Summary Update user profile
+// @Description Update user profile fields excluding email
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.UpdateProfileRequest true "Update Profile"
+// @Success 200 {object} models.UpdateProfileResponse
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /users/profile [put]
 func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := int(userClaims["user_id"].(float64))
@@ -178,6 +219,14 @@ func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// LogoutUser godoc
+// @Summary Logout user
+// @Description Invalidate the user's authentication token
+// @Tags Users
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /users/logout [post]
 func (ctrl *UserController) LogoutUser(c echo.Context) error {
 	// Ambil token dari Authorization header
 	authHeader := c.Request().Header.Get("Authorization")
@@ -193,6 +242,17 @@ func (ctrl *UserController) LogoutUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logout successful"})
 }
 
+// UpdatePassword godoc
+// @Summary Update user password
+// @Description Update user password with the current and new password
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body models.UpdatePasswordRequest true "Update Password"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /users/update-password [put]
 func (ctrl *UserController) UpdatePassword(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := int(userClaims["user_id"].(float64))
