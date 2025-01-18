@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 .env
 .idea/
+=======
+.local.env
+>>>>>>> c2f1c3117f7b99bc2a8c0ede7392998e4b912929
