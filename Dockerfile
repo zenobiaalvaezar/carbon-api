@@ -14,7 +14,7 @@ COPY . .
 ENV API_PORT=8080
 ENV PORT=8080
 ENV DATABASE_URL=postgresql://postgres.vqgvmkrcnphmmnclvwjs:AO7dSLJEBdiBJIDE@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
-ENV REDIS_HOST=redis://default:PRVTGXxETtdNYEEVpMApzGzxAVbfQqqm@monorail.proxy.rlwy.net:18146
+ENV REDIS_URL=redis://default:PRVTGXxETtdNYEEVpMApzGzxAVbfQqqm@monorail.proxy.rlwy.net:18146
 ENV SMTP_HOST=smtp.gmail.com
 ENV SMTP_PORT=587
 ENV SMTP_USERNAME=rehanadipurwana@gmail.com
