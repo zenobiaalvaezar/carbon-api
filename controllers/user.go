@@ -26,14 +26,14 @@ func NewUserController(userRepository repositories.UserRepository) *UserControll
 // RegisterUser godoc
 // @Summary Register a new user
 // @Description Register a new user with name, email, and password
-// @Tags Users
+// @Tags Auth
 // @Accept json
 // @Produce json
 // @Param body body models.RegisterRequest true "Register User"
 // @Success 201 {object} models.RegisterResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /users/register [post]
+// @Router /register [post]
 func (ctrl *UserController) RegisterUser(c echo.Context) error {
 	var request models.RegisterRequest
 	if err := c.Bind(&request); err != nil {
@@ -82,14 +82,14 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 // LoginUser godoc
 // @Summary Login user
 // @Description Authenticate a user and return a JWT token
-// @Tags Users
+// @Tags Auth
 // @Accept json
 // @Produce json
 // @Param body body models.LoginRequest true "Login User"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
-// @Router /users/login [post]
+// @Router /login [post]
 func (ctrl *UserController) LoginUser(c echo.Context) error {
 	var request models.LoginRequest
 	if err := c.Bind(&request); err != nil {
