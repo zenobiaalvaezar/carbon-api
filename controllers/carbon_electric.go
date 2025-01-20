@@ -25,12 +25,17 @@ func NewCarbonElectricController(carbonElectricRepository repositories.CarbonEle
 // @Produce json
 // @Success 200 {array} models.CarbonElectricResponse "List of carbon electric entries"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics [get]
 func (ctrl *CarbonElectricController) GetAllCarbonElectrics(c echo.Context) error {
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
+	userID, ok := c.Get("user_id").(int)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"message": "User ID is invalid or missing. Please log in to continue.",
+		})
+	}
 
-	carbonElectrics, status, err := ctrl.CarbonElectricRepository.GetAllCarbonElectrics(userId)
+	carbonElectrics, status, err := ctrl.CarbonElectricRepository.GetAllCarbonElectrics(userID)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
 	}
@@ -49,6 +54,7 @@ func (ctrl *CarbonElectricController) GetAllCarbonElectrics(c echo.Context) erro
 // @Failure 400 {object} map[string]string "Invalid carbon electric ID"
 // @Failure 404 {object} map[string]string "Carbon electric not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics/{id} [get]
 func (ctrl *CarbonElectricController) GetCarbonElectricByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -74,6 +80,7 @@ func (ctrl *CarbonElectricController) GetCarbonElectricByID(c echo.Context) erro
 // @Success 201 {object} models.CarbonElectricResponse "Successfully created carbon electric entry"
 // @Failure 400 {object} map[string]string "Invalid request payload or usage type/amount"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics [post]
 func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error {
 	var carbonElectricRequest models.CarbonElectricRequest
@@ -89,9 +96,14 @@ func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Usage amount must be greater than 0"})
 	}
 
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
-	carbonElectricRequest.UserID = userId
+	userID, ok := c.Get("user_id").(int)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"message": "User ID is invalid or missing. Please log in to continue.",
+		})
+	}
+
+	carbonElectricRequest.UserID = userID
 	carbonElectric, status, err := ctrl.CarbonElectricRepository.CreateCarbonElectric(carbonElectricRequest)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
@@ -111,6 +123,7 @@ func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error
 // @Failure 400 {object} map[string]string "Invalid carbon electric ID"
 // @Failure 404 {object} map[string]string "Carbon electric not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics/{id} [delete]
 func (ctrl *CarbonElectricController) DeleteCarbonElectric(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -118,9 +131,14 @@ func (ctrl *CarbonElectricController) DeleteCarbonElectric(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid carbon electric ID"})
 	}
 
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
-	status, err := ctrl.CarbonElectricRepository.DeleteCarbonElectric(id, userId)
+	userID, ok := c.Get("user_id").(int)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"message": "User ID is invalid or missing. Please log in to continue.",
+		})
+	}
+
+	status, err := ctrl.CarbonElectricRepository.DeleteCarbonElectric(id, userID)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
 	}

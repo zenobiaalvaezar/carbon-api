@@ -9,6 +9,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// @title Carbon API
+// @version 1.0
+// @description This is the API for managing carbon ecosystem.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	config.LoadEnv()
 
