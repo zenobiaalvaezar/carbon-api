@@ -27,6 +27,7 @@ func TestGetAllCarbonElectrics_Success(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/carbon-electrics", nil)
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
+	ctx.Set("user_id", 2)
 
 	err := controller.GetAllCarbonElectrics(ctx)
 	if err != nil {
@@ -52,6 +53,7 @@ func TestGetAllCarbonElectrics_Failure(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/carbon-electrics", nil)
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
+	ctx.Set("user_id", 2)
 
 	err := controller.GetAllCarbonElectrics(ctx)
 	if err != nil {
@@ -93,6 +95,7 @@ func TestGetCarbonElectricByID_Success(t *testing.T) {
 	ctx := e.NewContext(req, rec)
 	ctx.SetParamNames("id")
 	ctx.SetParamValues("1")
+	ctx.Set("user_id", 2)
 
 	err := controller.GetCarbonElectricByID(ctx)
 	if err != nil {
@@ -117,7 +120,8 @@ func TestGetCarbonElectricByID_Failure_InvalidID(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/carbon-electrics/invalid", nil)
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
-
+	ctx.Set("user_id", 2)
+	
 	err := controller.GetCarbonElectricByID(ctx)
 	if err != nil {
 		t.Fatalf("Error calling GetCarbonElectricByID (invalid ID): %v", err)
