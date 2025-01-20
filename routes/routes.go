@@ -123,8 +123,7 @@ func Init(e *echo.Echo) {
 	paymentController := controllers.NewPaymentController(paymentRepository)
 
 	p := e.Group("/payments")
-	p.Use(middlewares.CheckAuth)
-	p.POST("", paymentController.CreatePayment)
+	p.POST("", middlewares.CheckAuth(paymentController.CreatePayment))
 	p.GET("/verify/:id", paymentController.VerifyPayment)
 
 	// report
@@ -142,6 +141,9 @@ func Init(e *echo.Echo) {
 	pm := e.Group("/payment-methods")
 	pm.Use(middlewares.CheckAuth)
 	pm.GET("", paymentMethodController.GetAllPaymentMethods)
+	pm.POST("", paymentMethodController.CreatePaymentMethod)
+	pm.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
+	pm.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

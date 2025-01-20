@@ -6,5 +6,5 @@ import (
 
 type PaymentMethod struct {
 	ID   primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Code string             `bson:"code" json:"name"`
+	Code string             `bson:"code" json:"code"`
 }

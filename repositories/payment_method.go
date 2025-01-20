@@ -8,12 +8,16 @@ import (
 	"carbon-api/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type PaymentMethodRepository interface {
 	GetAllPaymentMethods() ([]models.PaymentMethod, int, error)
 	GetPaymentMethodByCode(code string) (models.PaymentMethod, int, error)
+	CreatePaymentMethod(paymentMethod models.PaymentMethod) (models.PaymentMethod, int, error)
+	UpdatePaymentMethod(id string, paymentMethod models.PaymentMethod) (models.PaymentMethod, int, error)
+	DeletePaymentMethod(id string) (int, error)
 }
 
 type paymentMethodRepository struct {
@@ -43,6 +47,10 @@ func (pmr *paymentMethodRepository) GetAllPaymentMethods() ([]models.PaymentMeth
 		paymentMethods = append(paymentMethods, paymentMethod)
 	}
 
+	if len(paymentMethods) == 0 {
+		paymentMethods = []models.PaymentMethod{}
+	}
+
 	return paymentMethods, http.StatusOK, nil
 }
 
@@ -60,4 +68,54 @@ func (pmr *paymentMethodRepository) GetPaymentMethodByCode(code string) (models.
 	}
 
 	return paymentMethod, http.StatusOK, nil
+}
+
+func (pmr *paymentMethodRepository) CreatePaymentMethod(paymentMethod models.PaymentMethod) (models.PaymentMethod, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := pmr.MongoCollection.InsertOne(ctx, paymentMethod)
+	if err != nil {
+		return models.PaymentMethod{}, http.StatusInternalServerError, err
+	}
+
+	paymentMethod.ID = result.InsertedID.(primitive.ObjectID)
+
+	return paymentMethod, http.StatusCreated, nil
+}
+
+func (pmr *paymentMethodRepository) UpdatePaymentMethod(id string, paymentMethod models.PaymentMethod) (models.PaymentMethod, int, error) {
+	paymentMethodID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return models.PaymentMethod{}, http.StatusBadRequest, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = pmr.MongoCollection.ReplaceOne(ctx, bson.M{"_id": paymentMethodID}, paymentMethod)
+	if err != nil {
+		return models.PaymentMethod{}, http.StatusInternalServerError, err
+	}
+
+	paymentMethod.ID = paymentMethodID
+
+	return paymentMethod, http.StatusOK, nil
+}
+
+func (pmr *paymentMethodRepository) DeletePaymentMethod(id string) (int, error) {
+	paymentMethodID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = pmr.MongoCollection.DeleteOne(ctx, bson.M{"_id": paymentMethodID})
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
 }

@@ -1,10 +1,9 @@
 package models
 
 type PaymentRequest struct {
-	TransactionID int     `json:"transaction_id"`
-	UserID        int     `json:"user_id"`
-	PaymentMethod string  `json:"payment_method"`
-	PaymentAmount float64 `json:"payment_amount"`
+	TransactionID int    `json:"transaction_id"`
+	UserID        int    `json:"user_id"`
+	PaymentMethod string `json:"payment_method"`
 }
 
 type PaymentResponse struct {

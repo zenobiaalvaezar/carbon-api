@@ -16,7 +16,7 @@ func NewReportController(reportRepository repositories.ReportRepository) *Report
 }
 
 func (controller *ReportController) GetReportSummary(c echo.Context) error {
-	userId := c.Get("user").(int)
+	userId := c.Get("user_id").(int)
 	report, statusCode, err := controller.ReportRepository.GetReportSummary(userId)
 	if err != nil {
 		return c.JSON(statusCode, err.Error())

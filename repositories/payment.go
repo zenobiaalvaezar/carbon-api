@@ -46,7 +46,7 @@ func (r *paymentRepository) CreatePayment(payment models.PaymentRequest) (models
 	baseURL := os.Getenv("BASE_URL")
 	invoice := models.InvoiceRequest{
 		ExternalId:         strconv.Itoa(payment.TransactionID),
-		Amount:             payment.PaymentAmount,
+		Amount:             transaction.TotalPrice,
 		Description:        "Top up deposit",
 		InvoiceDuration:    86400,
 		GivenNames:         user.Name,

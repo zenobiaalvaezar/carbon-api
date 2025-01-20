@@ -28,7 +28,7 @@ func (r *reportRepository) GetReportSummary(userId int) ([]models.ReportSummary,
 	}
 
 	var carbonTree int
-	err := r.DB.Raw("SELECT SUM(total_tree) FROM carbon_summary WHERE user_id = ?", userId).Scan(&carbonTree).Error
+	err := r.DB.Raw("SELECT SUM(total_tree) FROM carbon_summaries WHERE user_id = ?", userId).Scan(&carbonTree).Error
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}

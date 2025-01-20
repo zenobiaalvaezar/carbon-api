@@ -16,7 +16,7 @@ func NewTransactionController(TransactionRepository repositories.TransactionRepo
 }
 
 func (controller *TransactionController) GetAllTransactions(c echo.Context) error {
-	userId := c.Get("user").(int)
+	userId := c.Get("user_id").(int)
 	transactions, statusCode, err := controller.TransactionRepository.GetAllTransactions(userId)
 	if err != nil {
 		return c.JSON(statusCode, err.Error())
@@ -25,7 +25,7 @@ func (controller *TransactionController) GetAllTransactions(c echo.Context) erro
 }
 
 func (controller *TransactionController) AddTransaction(c echo.Context) error {
-	userId := c.Get("user").(int)
+	userId := c.Get("user_id").(int)
 	transaction, statusCode, err := controller.TransactionRepository.AddTransaction(userId)
 	if err != nil {
 		return c.JSON(statusCode, err.Error())
