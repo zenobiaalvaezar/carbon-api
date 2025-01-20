@@ -29,8 +29,7 @@ func NewCarbonFuelController(carbonFuelRepository repositories.CarbonFuelReposit
 // @Security BearerAuth
 // @Router /carbon-fuels [get]
 func (ctrl *CarbonFuelController) GetAllCarbonFuels(c echo.Context) error {
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
+	userId := c.Get("user_id").(int)
 
 	carbonFuels, status, err := ctrl.CarbonFuelRepository.GetAllCarbonFuels(userId)
 	if err != nil {
@@ -92,8 +91,7 @@ func (ctrl *CarbonFuelController) CreateCarbonFuel(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Usage amount must be greater than 0"})
 	}
 
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
+	userId := c.Get("user_id").(int)
 	carbonFuelRequest.UserID = userId
 	carbonFuel, status, err := ctrl.CarbonFuelRepository.CreateCarbonFuel(carbonFuelRequest)
 	if err != nil {
@@ -121,8 +119,7 @@ func (ctrl *CarbonFuelController) DeleteCarbonFuel(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid carbon fuel ID"})
 	}
 
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
+	userId := c.Get("user_id").(int)
 	status, err := ctrl.CarbonFuelRepository.DeleteCarbonFuel(id, userId)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})

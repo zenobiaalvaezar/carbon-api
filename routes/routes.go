@@ -109,5 +109,41 @@ func Init(e *echo.Echo) {
 	c.POST("", cartController.AddCart)
 	c.DELETE("/:id", cartController.DeleteCart)
 
+	// transaction
+	transactionRepository := repositories.NewTransactionRepository(config.DB)
+	transactionController := controllers.NewTransactionController(transactionRepository)
+
+	t := e.Group("/transactions")
+	t.Use(middlewares.CheckAuth)
+	t.GET("", transactionController.GetAllTransactions)
+	t.POST("", transactionController.AddTransaction)
+
+	// payment
+	paymentRepository := repositories.NewPaymentRepository(config.DB)
+	paymentController := controllers.NewPaymentController(paymentRepository)
+
+	p := e.Group("/payments")
+	p.POST("", middlewares.CheckAuth(paymentController.CreatePayment))
+	p.GET("/verify/:id", paymentController.VerifyPayment)
+
+	// report
+	reportRepository := repositories.NewReportRepository(config.DB)
+	reportController := controllers.NewReportController(reportRepository)
+
+	rp := e.Group("/reports")
+	rp.Use(middlewares.CheckAuth)
+	rp.GET("/summary", reportController.GetReportSummary)
+
+	// payment method
+	paymentMethodRepository := repositories.NewPaymentMethodRepository(config.MongoCollection)
+	paymentMethodController := controllers.NewPaymentMethodController(paymentMethodRepository)
+
+	pm := e.Group("/payment-methods")
+	pm.Use(middlewares.CheckAuth)
+	pm.GET("", paymentMethodController.GetAllPaymentMethods)
+	pm.POST("", paymentMethodController.CreatePaymentMethod)
+	pm.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
+	pm.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }
