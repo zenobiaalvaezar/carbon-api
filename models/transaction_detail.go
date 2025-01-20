@@ -8,3 +8,11 @@ type TransactionDetail struct {
 	Price         float64 `json:"price"`
 	TotalPrice    float64 `json:"total_price"`
 }
+
+type TransactionDetailResponse struct {
+	ID         int     `json:"id"`
+	TreeName   string  `json:"tree_name"`
+	Quantity   int     `json:"quantity"`
+	Price      float64 `json:"price"`
+	TotalPrice float64 `json:"total_price"`
+}

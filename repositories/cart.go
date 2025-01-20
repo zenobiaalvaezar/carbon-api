@@ -53,29 +53,49 @@ func (r *cartRepository) GetAllCart(userID int) ([]models.GetCartsResponse, int,
 }
 
 func (r *cartRepository) AddCart(cart models.AddCartRequest) (int, error) {
+	// check if tree exists
+	var tree models.Tree
+	r.DB.Where("id = ?", cart.TreeID).First(&tree)
+	if tree.ID == 0 {
+		return http.StatusNotFound, errors.New("Tree not found")
+	}
+
+	// check if tree stock enough
+	if tree.Stock < cart.Quantity {
+		return http.StatusBadRequest, errors.New("Not enough stock")
+	}
+
+	// check if cart already exists
+	var existingCart models.Cart
+	r.DB.Where("user_id = ? AND tree_id = ?", cart.UserID, cart.TreeID).First(&existingCart)
+	if existingCart.ID != 0 {
+		existingCart.Quantity += cart.Quantity
+		err := r.DB.Save(&existingCart).Error
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		return http.StatusOK, nil
+	}
+
 	newCart := models.Cart{
 		UserID:   cart.UserID,
 		TreeID:   cart.TreeID,
 		Quantity: cart.Quantity,
 	}
-
-	// if tree already exists in cart then replace the quantity
-	var existingCart models.Cart
-	r.DB.Where("user_id = ? AND tree_id = ?", cart.UserID, cart.TreeID).First(&existingCart)
-	if existingCart.ID != 0 {
-		newCart.ID = existingCart.ID
-		err := r.DB.Save(&newCart).Error
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
-	} else {
-		err := r.DB.Create(&newCart).Error
-		if err != nil {
-			return http.StatusInternalServerError, err
-		}
+	err := r.DB.Create(&newCart).Error
+	if err != nil {
+		return http.StatusInternalServerError, err
 	}
 
-	return http.StatusCreated, nil
+	// update tree stock
+	tree.Stock -= cart.Quantity
+	err = r.DB.Save(&tree).Error
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
 }
 
 func (r *cartRepository) DeleteCart(cartID int) (int, error) {
