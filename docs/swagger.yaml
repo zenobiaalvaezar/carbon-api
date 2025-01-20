@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.CarbonElectricRequest:
     properties:
@@ -236,8 +237,16 @@ definitions:
       role_id:
         type: integer
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API for managing carbon ecosystem.
+  termsOfService: http://swagger.io/terms/
+  title: Carbon API
+  version: "1.0"
 paths:
   /carbon-electrics:
     get:
@@ -1281,4 +1290,9 @@ paths:
       summary: Update user password
       tags:
       - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
