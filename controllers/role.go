@@ -25,6 +25,7 @@ func NewRoleController(roleRepository repositories.RoleRepository) *RoleControll
 // @Produce json
 // @Success 200 {array} models.Role "List of roles"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /roles [get]
 func (ctrl *RoleController) GetAllRoles(c echo.Context) error {
 	roles, status, err := ctrl.RoleRepository.GetAllRoles()
@@ -45,6 +46,7 @@ func (ctrl *RoleController) GetAllRoles(c echo.Context) error {
 // @Failure 400 {object} map[string]string "Invalid role ID"
 // @Failure 404 {object} map[string]string "Role not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /roles/{id} [get]
 func (ctrl *RoleController) GetRoleByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -69,6 +71,7 @@ func (ctrl *RoleController) GetRoleByID(c echo.Context) error {
 // @Success 201 {object} models.Role "Successfully created role"
 // @Failure 400 {object} map[string]string "Invalid request payload"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /roles [post]
 func (ctrl *RoleController) CreateRole(c echo.Context) error {
 	var roleRequest models.RoleRequest
@@ -95,6 +98,7 @@ func (ctrl *RoleController) CreateRole(c echo.Context) error {
 // @Failure 400 {object} map[string]string "Invalid role ID or request payload"
 // @Failure 404 {object} map[string]string "Role not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /roles/{id} [put]
 func (ctrl *RoleController) UpdateRole(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -125,6 +129,7 @@ func (ctrl *RoleController) UpdateRole(c echo.Context) error {
 // @Failure 400 {object} map[string]string "Invalid role ID"
 // @Failure 404 {object} map[string]string "Role not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /roles/{id} [delete]
 func (ctrl *RoleController) DeleteRole(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))

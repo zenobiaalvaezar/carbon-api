@@ -26,6 +26,7 @@ func NewCarbonFuelController(carbonFuelRepository repositories.CarbonFuelReposit
 // @Success 200 {array} models.CarbonFuelResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /carbon-fuels [get]
 func (ctrl *CarbonFuelController) GetAllCarbonFuels(c echo.Context) error {
 	// userId := c.Get("user_id").(int)
@@ -49,6 +50,7 @@ func (ctrl *CarbonFuelController) GetAllCarbonFuels(c echo.Context) error {
 // @Success 200 {object} models.CarbonFuelResponse
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /carbon-fuels/{id} [get]
 func (ctrl *CarbonFuelController) GetCarbonFuelByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -74,6 +76,7 @@ func (ctrl *CarbonFuelController) GetCarbonFuelByID(c echo.Context) error {
 // @Success 201 {object} models.CarbonFuelResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /carbon-fuels [post]
 func (ctrl *CarbonFuelController) CreateCarbonFuel(c echo.Context) error {
 	var carbonFuelRequest models.CarbonFuelRequest
@@ -110,6 +113,7 @@ func (ctrl *CarbonFuelController) CreateCarbonFuel(c echo.Context) error {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /carbon-fuels/{id} [delete]
 func (ctrl *CarbonFuelController) DeleteCarbonFuel(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
