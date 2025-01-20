@@ -25,6 +25,7 @@ func NewCarbonElectricController(carbonElectricRepository repositories.CarbonEle
 // @Produce json
 // @Success 200 {array} models.CarbonElectricResponse "List of carbon electric entries"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics [get]
 func (ctrl *CarbonElectricController) GetAllCarbonElectrics(c echo.Context) error {
 	// userId := c.Get("user_id").(int)
@@ -49,6 +50,7 @@ func (ctrl *CarbonElectricController) GetAllCarbonElectrics(c echo.Context) erro
 // @Failure 400 {object} map[string]string "Invalid carbon electric ID"
 // @Failure 404 {object} map[string]string "Carbon electric not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics/{id} [get]
 func (ctrl *CarbonElectricController) GetCarbonElectricByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -74,6 +76,7 @@ func (ctrl *CarbonElectricController) GetCarbonElectricByID(c echo.Context) erro
 // @Success 201 {object} models.CarbonElectricResponse "Successfully created carbon electric entry"
 // @Failure 400 {object} map[string]string "Invalid request payload or usage type/amount"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics [post]
 func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error {
 	var carbonElectricRequest models.CarbonElectricRequest
@@ -111,6 +114,7 @@ func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error
 // @Failure 400 {object} map[string]string "Invalid carbon electric ID"
 // @Failure 404 {object} map[string]string "Carbon electric not found"
 // @Failure 500 {object} map[string]string "Internal server error"
+// @Security BearerAuth
 // @Router /carbon-electrics/{id} [delete]
 func (ctrl *CarbonElectricController) DeleteCarbonElectric(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
