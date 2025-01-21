@@ -37,6 +37,7 @@ func TestGetAllCarbonFuels(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/carbon-fuels", nil)
 	rec := httptest.NewRecorder()
 	c := echo.New().NewContext(req, rec)
+	c.Set("user_id", 2)
 
 	err := ctrl.GetAllCarbonFuels(c)
 

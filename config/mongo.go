@@ -13,12 +13,11 @@ var MongoCollection *mongo.Collection
 var MongoClient *mongo.Client
 
 func ConnectMongo(ctx context.Context) {
-	dbHost := os.Getenv("MONGO_HOST")
-	dbPort := os.Getenv("MONGO_PORT")
+	dbUri := os.Getenv("MONGODB_URI")
 	dbName := os.Getenv("MONGO_DATABASE")
 	collectionName := os.Getenv("MONGO_COLLECTION")
 
-	MongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+dbHost+":"+dbPort))
+	MongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
 	if err != nil {
 		panic(err)
 	}
