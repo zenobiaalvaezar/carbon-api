@@ -2012,7 +2012,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "https://carbon-api-70017640279.us-central1.run.app",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Carbon API",
