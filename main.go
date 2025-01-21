@@ -18,7 +18,7 @@ import (
 // @contact.url http://www.swagger.io/support
 // @contact.email support@swagger.io
 
-// @host https://carbon-api-70017640279.us-central1.run.app/
+// @host https://carbon-api-70017640279.us-central1.run.app
 // @BasePath /
 
 // @securityDefinitions.apikey BearerAuth
