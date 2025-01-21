@@ -26,6 +26,9 @@ ENV SMTP_USERNAME=rehanadipurwana@gmail.com
 ENV SMTP_PASSWORD=vcjwrthkeoivbpdf
 ENV XENDIT_API_URL="https://api.xendit.co/v2/invoices"
 ENV XENDIT_SECRET_KEY="xnd_development_T0trkUor1Wf5EdSyEdaPEbTesSKYCt4tDHyX38wddSQ04TlRbvp00UK1i0v5Ql3Q"
+ENV MONGODB_URI="mongodb+srv://fr081938:12345678___@cluster0.7d2ce.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+ENV MONGO_DATABASE=carbon
+ENV MONGO_COLLECTION=payment_methods
 
 # Build the Go application
 RUN go build -o main .
