@@ -119,7 +119,7 @@ func Init(e *echo.Echo) {
 	t.POST("", transactionController.AddTransaction)
 
 	// payment
-	paymentRepository := repositories.NewPaymentRepository(config.DB)
+	paymentRepository := repositories.NewPaymentRepository(config.DB, config.MongoCollection)
 	paymentController := controllers.NewPaymentController(paymentRepository)
 
 	p := e.Group("/payments")

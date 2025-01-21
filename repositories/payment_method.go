@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -73,6 +74,15 @@ func (pmr *paymentMethodRepository) GetPaymentMethodByCode(code string) (models.
 func (pmr *paymentMethodRepository) CreatePaymentMethod(paymentMethod models.PaymentMethod) (models.PaymentMethod, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	if paymentMethod.Code == "" {
+		return models.PaymentMethod{}, http.StatusBadRequest, errors.New("code is required")
+	}
+
+	_, _, err := pmr.GetPaymentMethodByCode(paymentMethod.Code)
+	if err == nil {
+		return models.PaymentMethod{}, http.StatusConflict, errors.New("code already exists")
+	}
 
 	result, err := pmr.MongoCollection.InsertOne(ctx, paymentMethod)
 	if err != nil {
