@@ -1,0 +1,1298 @@
+basePath: /
+definitions:
+  models.CarbonElectricRequest:
+    properties:
+      electric_id:
+        type: integer
+      emission_factor:
+        type: number
+      price:
+        type: number
+      usage_amount:
+        type: number
+      usage_type:
+        enum:
+        - consumption
+        - rupiah
+        type: string
+      user_id:
+        type: integer
+    required:
+    - electric_id
+    - emission_factor
+    - price
+    - usage_amount
+    - usage_type
+    - user_id
+    type: object
+  models.CarbonElectricResponse:
+    properties:
+      emission_amount:
+        type: number
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      total_consumption:
+        type: number
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  models.CarbonFuelRequest:
+    properties:
+      fuel_id:
+        type: integer
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.CarbonFuelResponse:
+    properties:
+      emission_amount:
+        type: number
+      emission_factor:
+        type: number
+      fuel_id:
+        type: integer
+      fuel_name:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      total_consumption:
+        type: number
+      unit:
+        type: string
+      usage_amount:
+        type: number
+      usage_type:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  models.CarbonSummaryResponse:
+    properties:
+      electric_emission:
+        type: number
+      fuel_emission:
+        type: number
+      total_emission:
+        type: number
+      total_tree:
+        type: integer
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  models.Electric:
+    properties:
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      price:
+        type: number
+      province:
+        type: string
+    type: object
+  models.Fuel:
+    properties:
+      category:
+        type: string
+      emission_factor:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      unit:
+        type: string
+    type: object
+  models.FuelRequest:
+    properties:
+      category:
+        type: string
+      emission_factor:
+        type: number
+      name:
+        type: string
+      price:
+        type: number
+      unit:
+        type: string
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.RegisterResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.RoleRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  models.UpdatePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    type: object
+  models.UpdateProfileRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.UpdateProfileResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.UserProfileResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API for managing carbon ecosystem.
+  termsOfService: http://swagger.io/terms/
+  title: Carbon API
+  version: "1.0"
+paths:
+  /carbon-electrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of carbon electric entries for the logged-in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of carbon electric entries
+          schema:
+            items:
+              $ref: '#/definitions/models.CarbonElectricResponse'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all carbon electrics
+      tags:
+      - CarbonElectrics
+    post:
+      consumes:
+      - application/json
+      description: Add a new carbon electric entry for the logged-in user
+      parameters:
+      - description: Carbon Electric request body
+        in: body
+        name: carbonElectricRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarbonElectricRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created carbon electric entry
+          schema:
+            $ref: '#/definitions/models.CarbonElectricResponse'
+        "400":
+          description: Invalid request payload or usage type/amount
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new carbon electric entry
+      tags:
+      - CarbonElectrics
+  /carbon-electrics/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific carbon electric entry by its unique ID
+      parameters:
+      - description: Carbon Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted carbon electric entry
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid carbon electric ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Carbon electric not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a carbon electric entry
+      tags:
+      - CarbonElectrics
+    get:
+      consumes:
+      - application/json
+      description: Fetch details of a specific carbon electric entry by its unique
+        ID
+      parameters:
+      - description: Carbon Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Carbon electric entry details
+          schema:
+            $ref: '#/definitions/models.CarbonElectricResponse'
+        "400":
+          description: Invalid carbon electric ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Carbon electric not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a carbon electric entry by ID
+      tags:
+      - CarbonElectrics
+  /carbon-fuels:
+    get:
+      consumes:
+      - application/json
+      description: Get all carbon fuels for a specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CarbonFuelResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all carbon fuels
+      tags:
+      - CarbonFuels
+    post:
+      consumes:
+      - application/json
+      description: Create a new carbon fuel entry for a user with specific fuel data
+      parameters:
+      - description: Create Carbon Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarbonFuelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CarbonFuelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new carbon fuel entry
+      tags:
+      - CarbonFuels
+  /carbon-fuels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a carbon fuel entry by ID for a specific user
+      parameters:
+      - description: Carbon Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a carbon fuel entry
+      tags:
+      - CarbonFuels
+    get:
+      consumes:
+      - application/json
+      description: Get a specific carbon fuel by its ID
+      parameters:
+      - description: Carbon Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CarbonFuelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get carbon fuel by ID
+      tags:
+      - CarbonFuels
+  /carbon-summary:
+    get:
+      consumes:
+      - application/json
+      description: Get the carbon summary for a specific user, including fuel and
+        electric emissions, total emissions, and total trees equivalent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CarbonSummaryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get carbon summary
+      tags:
+      - CarbonSummary
+  /electrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all electric records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of electrics
+          schema:
+            items:
+              $ref: '#/definitions/models.Electric'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all electric data
+      tags:
+      - Electrics
+    post:
+      consumes:
+      - application/json
+      description: Add a new electric record to the database
+      parameters:
+      - description: Electric data
+        in: body
+        name: electric
+        required: true
+        schema:
+          $ref: '#/definitions/models.Electric'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created electric
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new electric record
+      tags:
+      - Electrics
+  /electrics/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an electric record from the database
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Electric deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid electric ID
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an electric record by ID
+      tags:
+      - Electrics
+    get:
+      consumes:
+      - application/json
+      description: Fetch an electric record using its unique ID
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Electric details
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid electric ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Electric not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get an electric record by ID
+      tags:
+      - Electrics
+    put:
+      consumes:
+      - application/json
+      description: Modify the details of an existing electric record
+      parameters:
+      - description: Electric ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated electric data
+        in: body
+        name: electric
+        required: true
+        schema:
+          $ref: '#/definitions/models.Electric'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated electric
+          schema:
+            $ref: '#/definitions/models.Electric'
+        "400":
+          description: Invalid electric ID or payload
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an electric record by ID
+      tags:
+      - Electrics
+  /fuels:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all fuels from cache, if not found, retrieve
+        from database and cache it
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Fuel'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all fuels
+      tags:
+      - Fuels
+    post:
+      consumes:
+      - application/json
+      description: Create a new fuel record and store it in both the database and
+        cache
+      parameters:
+      - description: Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FuelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new fuel
+      tags:
+      - Fuels
+  /fuels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific fuel by ID from both the database and cache
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a fuel
+      tags:
+      - Fuels
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific fuel by ID from cache, if not found, retrieve
+        from database and cache it
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a fuel by ID
+      tags:
+      - Fuels
+    put:
+      consumes:
+      - application/json
+      description: Update a specific fuel by ID in both the database and cache
+      parameters:
+      - description: Fuel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fuel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FuelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Fuel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an existing fuel
+      tags:
+      - Fuels
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: Login User
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login user
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with name, email, and password
+      parameters:
+      - description: Register User
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of roles
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Add a new role to the system
+      parameters:
+      - description: Role request payload
+        in: body
+        name: roleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created role
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new role
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted role
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of a specific role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role details
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a role by ID
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing role by its unique ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Role update request payload
+        in: body
+        name: roleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated role
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid role ID or request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a role
+      tags:
+      - Roles
+  /users/logout:
+    post:
+      description: Invalidate the user's authentication token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - Users
+  /users/profile:
+    get:
+      description: Retrieve the profile information of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserProfileResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update user profile fields excluding email
+      parameters:
+      - description: Update Profile
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateProfileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - Users
+  /users/update-password:
+    put:
+      consumes:
+      - application/json
+      description: Update user password with the current and new password
+      parameters:
+      - description: Update Password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user password
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

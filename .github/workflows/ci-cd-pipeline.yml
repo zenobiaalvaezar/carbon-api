@@ -1,0 +1,89 @@
+name: GoLang CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }} 
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22'
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies and run tests
+        run: |
+          go mod tidy
+          go test ./...
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use
+          docker buildx version
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Authenticate Docker to GCR
+        run: |
+          gcloud auth configure-docker
+
+      - name: Build and Push Docker image to GCR
+        run: |
+          docker buildx build -t gcr.io/persuasive-axe-317613/carbon-api:latest --push .
+
+      - name: Set up gcloud CLI
+        run: |
+          gcloud --quiet config set project persuasive-axe-317613
+          gcloud --quiet config set compute/region us-central1
+          gcloud --quiet config set compute/zone us-central1-a
+
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy carbon-api \
+            --image gcr.io/persuasive-axe-317613/carbon-api:latest \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --timeout 10m

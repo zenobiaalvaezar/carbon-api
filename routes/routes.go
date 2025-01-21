@@ -7,7 +7,10 @@ import (
 	"carbon-api/middlewares"
 	"carbon-api/repositories"
 
+	_ "carbon-api/docs"
+
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func Init(e *echo.Echo) {
@@ -85,10 +88,57 @@ func Init(e *echo.Echo) {
 	carbonElectricRepo := repositories.NewCarbonElectricRepository(config.DB)
 	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
 
-	l.GET("/carbon-electric", carbonElectricController.GetAllCarbonElectrics)
-	l.GET("/carbon-electric/:id", carbonElectricController.GetCarbonElectricByID)
-	l.POST("/carbon-electric", carbonElectricController.CreateCarbonElectric)
-	l.DELETE("/carbon-electric/:id", carbonElectricController.DeleteCarbonElectric)
+	ce := e.Group("/carbon-electrics")
+	ce.GET("", carbonElectricController.GetAllCarbonElectrics)
+	ce.GET("/:id", carbonElectricController.GetCarbonElectricByID)
+	ce.POST("", carbonElectricController.CreateCarbonElectric)
+	ce.DELETE("/:id", carbonElectricController.DeleteCarbonElectric)
+
+	// cart
+	cartRepository := repositories.NewCartRepository(config.DB)
+	cartController := controllers.NewCartController(cartRepository)
+
+	c := e.Group("/carts")
+	c.Use(middlewares.CheckAuth)
+	c.GET("", cartController.GetAllCart)
+	c.POST("", cartController.AddCart)
+	c.DELETE("/:id", cartController.DeleteCart)
+
+	// transaction
+	transactionRepository := repositories.NewTransactionRepository(config.DB)
+	transactionController := controllers.NewTransactionController(transactionRepository)
+
+	t := e.Group("/transactions")
+	t.Use(middlewares.CheckAuth)
+	t.GET("", transactionController.GetAllTransactions)
+	t.POST("", transactionController.AddTransaction)
+
+	// payment
+	paymentRepository := repositories.NewPaymentRepository(config.DB)
+	paymentController := controllers.NewPaymentController(paymentRepository)
+
+	p := e.Group("/payments")
+	p.POST("", middlewares.CheckAuth(paymentController.CreatePayment))
+	p.GET("/verify/:id", paymentController.VerifyPayment)
+
+	// report
+	reportRepository := repositories.NewReportRepository(config.DB)
+	reportController := controllers.NewReportController(reportRepository)
+
+	rp := e.Group("/reports")
+	rp.Use(middlewares.CheckAuth)
+	rp.GET("/summary", reportController.GetReportSummary)
+
+	// payment method
+	paymentMethodRepository := repositories.NewPaymentMethodRepository(config.MongoCollection)
+	paymentMethodController := controllers.NewPaymentMethodController(paymentMethodRepository)
+
+	pm := e.Group("/payment-methods")
+	pm.Use(middlewares.CheckAuth)
+	pm.GET("", paymentMethodController.GetAllPaymentMethods)
+	pm.POST("", paymentMethodController.CreatePaymentMethod)
+	pm.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
+	pm.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
 
 	// Routes for TreeCategory
 	ct := e.Group("/tree-categories")
@@ -102,10 +152,13 @@ func Init(e *echo.Echo) {
 	treeRepository := repositories.NewTreeRepository(config.DB)
 	treeCache := caches.NewTreeCache(config.RedisClient)
 	treeController := controllers.NewTreeController(treeRepository, treeCache)
-	t := e.Group("/trees")
-	t.GET("", treeController.GetAllTrees)
-	t.GET("/:id", treeController.GetTreeByID)
-	t.POST("", treeController.CreateTree)
-	t.PUT("/:id", treeController.UpdateTree)
-	t.DELETE("/:id", treeController.DeleteTree)
+	tr := e.Group("/trees")
+	tr.GET("", treeController.GetAllTrees)
+	tr.GET("/:id", treeController.GetTreeByID)
+	tr.POST("", treeController.CreateTree)
+	tr.PUT("/:id", treeController.UpdateTree)
+	tr.DELETE("/:id", treeController.DeleteTree)
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 }

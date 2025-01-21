@@ -13,3 +13,13 @@ type Transaction struct {
 	PaymentStatus string    `json:"payment_status"`
 	PaymentAt     time.Time `json:"payment_at"`
 }
+
+type TransactionResponse struct {
+	ID            int                         `json:"id"`
+	TotalPrice    float64                     `json:"total_price"`
+	CreatedAt     time.Time                   `json:"created_at"`
+	PaymentMethod string                      `json:"payment_method"`
+	PaymentStatus string                      `json:"payment_status"`
+	PaymentAt     time.Time                   `json:"payment_at"`
+	Details       []TransactionDetailResponse `json:"details"`
+}

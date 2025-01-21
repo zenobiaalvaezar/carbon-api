@@ -19,6 +19,16 @@ func NewElectricController(electricRepository repositories.ElectricRepository, e
 	return &ElectricController{electricRepository, electricCache}
 }
 
+// GetAllElectrics godoc
+// @Summary Get all electric data
+// @Description Retrieve a list of all electric records
+// @Tags Electrics
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Electric "List of electrics"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /electrics [get]
 func (ctrl *ElectricController) GetAllElectrics(c echo.Context) error {
 	electrics, status, err := ctrl.ElectricCache.GetAllElectrics()
 	if err != nil || len(electrics) == 0 {
@@ -35,6 +45,19 @@ func (ctrl *ElectricController) GetAllElectrics(c echo.Context) error {
 	return c.JSON(status, electrics)
 }
 
+// GetElectricByID godoc
+// @Summary Get an electric record by ID
+// @Description Fetch an electric record using its unique ID
+// @Tags Electrics
+// @Accept json
+// @Produce json
+// @Param id path int true "Electric ID"
+// @Success 200 {object} models.Electric "Electric details"
+// @Failure 400 {object} map[string]interface{} "Invalid electric ID"
+// @Failure 404 {object} map[string]interface{} "Electric not found"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /electrics/{id} [get]
 func (ctrl *ElectricController) GetElectricByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -59,6 +82,18 @@ func (ctrl *ElectricController) GetElectricByID(c echo.Context) error {
 	return c.JSON(cacheStatus, electric)
 }
 
+// CreateElectric godoc
+// @Summary Create a new electric record
+// @Description Add a new electric record to the database
+// @Tags Electrics
+// @Accept json
+// @Produce json
+// @Param electric body models.Electric true "Electric data"
+// @Success 201 {object} models.Electric "Created electric"
+// @Failure 400 {object} map[string]interface{} "Invalid request payload"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /electrics [post]
 func (ctrl *ElectricController) CreateElectric(c echo.Context) error {
 	var electric models.Electric
 	if err := c.Bind(&electric); err != nil {
@@ -78,6 +113,19 @@ func (ctrl *ElectricController) CreateElectric(c echo.Context) error {
 	return c.JSON(http.StatusCreated, electric)
 }
 
+// UpdateElectric godoc
+// @Summary Update an electric record by ID
+// @Description Modify the details of an existing electric record
+// @Tags Electrics
+// @Accept json
+// @Produce json
+// @Param id path int true "Electric ID"
+// @Param electric body models.Electric true "Updated electric data"
+// @Success 200 {object} models.Electric "Updated electric"
+// @Failure 400 {object} map[string]interface{} "Invalid electric ID or payload"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /electrics/{id} [put]
 func (ctrl *ElectricController) UpdateElectric(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -102,6 +150,18 @@ func (ctrl *ElectricController) UpdateElectric(c echo.Context) error {
 	return c.JSON(http.StatusOK, electric)
 }
 
+// DeleteElectric godoc
+// @Summary Delete an electric record by ID
+// @Description Remove an electric record from the database
+// @Tags Electrics
+// @Accept json
+// @Produce json
+// @Param id path int true "Electric ID"
+// @Success 200 {object} map[string]interface{} "Electric deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid electric ID"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /electrics/{id} [delete]
 func (ctrl *ElectricController) DeleteElectric(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
