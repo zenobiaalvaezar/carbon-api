@@ -237,7 +237,7 @@ definitions:
       role_id:
         type: integer
     type: object
-host: localhost:8080
+host: https://carbon-api-70017640279.us-central1.run.app/
 info:
   contact:
     email: support@swagger.io
