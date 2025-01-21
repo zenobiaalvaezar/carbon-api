@@ -142,6 +142,7 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 // @Produce json
 // @Success 200 {object} models.UserProfileResponse
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /users/profile [get]
 func (ctrl *UserController) GetProfile(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
@@ -177,6 +178,7 @@ func (ctrl *UserController) GetProfile(c echo.Context) error {
 // @Success 200 {object} models.UpdateProfileResponse
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /users/profile [put]
 func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
@@ -226,6 +228,7 @@ func (ctrl *UserController) UpdateProfile(c echo.Context) error {
 // @Produce json
 // @Success 200 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /users/logout [post]
 func (ctrl *UserController) LogoutUser(c echo.Context) error {
 	// Ambil token dari Authorization header
@@ -252,6 +255,7 @@ func (ctrl *UserController) LogoutUser(c echo.Context) error {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /users/update-password [put]
 func (ctrl *UserController) UpdatePassword(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)

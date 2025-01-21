@@ -9,7 +9,12 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -17,6 +22,11 @@ const docTemplate = `{
     "paths": {
         "/carbon-electrics": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of carbon electric entries for the logged-in user",
                 "consumes": [
                     "application/json"
@@ -50,6 +60,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add a new carbon electric entry for the logged-in user",
                 "consumes": [
                     "application/json"
@@ -102,6 +117,11 @@ const docTemplate = `{
         },
         "/carbon-electrics/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Fetch details of a specific carbon electric entry by its unique ID",
                 "consumes": [
                     "application/json"
@@ -159,6 +179,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a specific carbon electric entry by its unique ID",
                 "consumes": [
                     "application/json"
@@ -221,6 +246,11 @@ const docTemplate = `{
         },
         "/carbon-fuels": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all carbon fuels for a specific user",
                 "consumes": [
                     "application/json"
@@ -263,6 +293,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new carbon fuel entry for a user with specific fuel data",
                 "consumes": [
                     "application/json"
@@ -315,6 +350,11 @@ const docTemplate = `{
         },
         "/carbon-fuels/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a specific carbon fuel by its ID",
                 "consumes": [
                     "application/json"
@@ -363,6 +403,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a carbon fuel entry by ID for a specific user",
                 "consumes": [
                     "application/json"
@@ -457,6 +502,11 @@ const docTemplate = `{
         },
         "/electrics": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all electric records",
                 "consumes": [
                     "application/json"
@@ -488,6 +538,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add a new electric record to the database",
                 "consumes": [
                     "application/json"
@@ -536,6 +591,11 @@ const docTemplate = `{
         },
         "/electrics/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Fetch an electric record using its unique ID",
                 "consumes": [
                     "application/json"
@@ -587,6 +647,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Modify the details of an existing electric record",
                 "consumes": [
                     "application/json"
@@ -640,6 +705,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Remove an electric record from the database",
                 "consumes": [
                     "application/json"
@@ -687,6 +757,11 @@ const docTemplate = `{
         },
         "/fuels": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all fuels from cache, if not found, retrieve from database and cache it",
                 "consumes": [
                     "application/json"
@@ -720,6 +795,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new fuel record and store it in both the database and cache",
                 "consumes": [
                     "application/json"
@@ -772,6 +852,11 @@ const docTemplate = `{
         },
         "/fuels/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a specific fuel by ID from cache, if not found, retrieve from database and cache it",
                 "consumes": [
                     "application/json"
@@ -829,6 +914,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update a specific fuel by ID in both the database and cache",
                 "consumes": [
                     "application/json"
@@ -895,6 +985,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a specific fuel by ID from both the database and cache",
                 "consumes": [
                     "application/json"
@@ -1062,6 +1157,11 @@ const docTemplate = `{
         },
         "/roles": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all roles",
                 "consumes": [
                     "application/json"
@@ -1095,6 +1195,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add a new role to the system",
                 "consumes": [
                     "application/json"
@@ -1147,6 +1252,11 @@ const docTemplate = `{
         },
         "/roles/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve details of a specific role by its unique ID",
                 "consumes": [
                     "application/json"
@@ -1204,6 +1314,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update details of an existing role by its unique ID",
                 "consumes": [
                     "application/json"
@@ -1270,6 +1385,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Remove a specific role by its unique ID",
                 "consumes": [
                     "application/json"
@@ -1332,6 +1452,11 @@ const docTemplate = `{
         },
         "/users/logout": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Invalidate the user's authentication token",
                 "produces": [
                     "application/json"
@@ -1364,6 +1489,11 @@ const docTemplate = `{
         },
         "/users/profile": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve the profile information of the authenticated user",
                 "produces": [
                     "application/json"
@@ -1391,6 +1521,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update user profile fields excluding email",
                 "consumes": [
                     "application/json"
@@ -1443,6 +1578,11 @@ const docTemplate = `{
         },
         "/users/update-password": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update user password with the current and new password",
                 "consumes": [
                     "application/json"
@@ -1859,17 +1999,24 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Carbon API",
+	Description:      "This is the API for managing carbon ecosystem.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

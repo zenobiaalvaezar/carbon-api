@@ -27,6 +27,7 @@ func NewFuelController(fuelRepository repositories.FuelRepository, fuelCache cac
 // @Produce json
 // @Success 200 {array} models.Fuel
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /fuels [get]
 func (ctrl *FuelController) GetAllFuels(c echo.Context) error {
 	var fuels []models.Fuel
@@ -64,6 +65,7 @@ func (ctrl *FuelController) GetAllFuels(c echo.Context) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /fuels/{id} [get]
 func (ctrl *FuelController) GetFuelByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -105,6 +107,7 @@ func (ctrl *FuelController) GetFuelByID(c echo.Context) error {
 // @Success 201 {object} models.Fuel
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /fuels [post]
 func (ctrl *FuelController) CreateFuel(c echo.Context) error {
 	var fuelRequest models.FuelRequest
@@ -143,6 +146,7 @@ func (ctrl *FuelController) CreateFuel(c echo.Context) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /fuels/{id} [put]
 func (ctrl *FuelController) UpdateFuel(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -185,6 +189,7 @@ func (ctrl *FuelController) UpdateFuel(c echo.Context) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /fuels/{id} [delete]
 func (ctrl *FuelController) DeleteFuel(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))

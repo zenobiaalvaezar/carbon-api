@@ -13,17 +13,6 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-// @title Carbon API
-// @version 1.0
-// @description This is the API for managing carbon ecosystem.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @host localhost:8080
-// @BasePath /
 func Init(e *echo.Echo) {
 	// Fuel routes
 	fuelRepository := repositories.NewFuelRepository(config.DB)
@@ -119,6 +108,51 @@ func Init(e *echo.Echo) {
 	c.GET("", cartController.GetAllCart)
 	c.POST("", cartController.AddCart)
 	c.DELETE("/:id", cartController.DeleteCart)
+
+	// transaction
+	transactionRepository := repositories.NewTransactionRepository(config.DB)
+	transactionController := controllers.NewTransactionController(transactionRepository)
+
+	t := e.Group("/transactions")
+	t.Use(middlewares.CheckAuth)
+	t.GET("", transactionController.GetAllTransactions)
+	t.POST("", transactionController.AddTransaction)
+
+	// payment
+	paymentRepository := repositories.NewPaymentRepository(config.DB)
+	paymentController := controllers.NewPaymentController(paymentRepository)
+
+	p := e.Group("/payments")
+	p.POST("", middlewares.CheckAuth(paymentController.CreatePayment))
+	p.GET("/verify/:id", paymentController.VerifyPayment)
+
+	// report
+	reportRepository := repositories.NewReportRepository(config.DB)
+	reportController := controllers.NewReportController(reportRepository)
+
+	rp := e.Group("/reports")
+	rp.Use(middlewares.CheckAuth)
+	rp.GET("/summary", reportController.GetReportSummary)
+
+	// payment method
+	paymentMethodRepository := repositories.NewPaymentMethodRepository(config.MongoCollection)
+	paymentMethodController := controllers.NewPaymentMethodController(paymentMethodRepository)
+
+	pm := e.Group("/payment-methods")
+	pm.Use(middlewares.CheckAuth)
+	pm.GET("", paymentMethodController.GetAllPaymentMethods)
+	pm.POST("", paymentMethodController.CreatePaymentMethod)
+	pm.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
+	pm.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
+
+	pdfGeneratorController := controllers.NewGeneratePdfController()
+
+	e.POST("/generate-pdf", pdfGeneratorController.PdfHandler)
+	e.POST("/generate-pdf-summary", pdfGeneratorController.PdfHandlerSummary)
+
+	newGeminiAPIController := controllers.NewGeminiAPIController()
+	e.POST("/ai", newGeminiAPIController.GeminiAPI)
+	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

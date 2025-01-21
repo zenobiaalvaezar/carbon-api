@@ -98,8 +98,8 @@ CREATE TABLE transactions (
   user_id INT NOT NULL,
   total_price FLOAT NOT NULL,
   created_at DATE NOT NULL,
-  payment_method VARCHAR(255) NOT NULL,
-  payment_status VARCHAR(255) NOT NULL,
+  payment_method VARCHAR(255),
+  payment_status VARCHAR(255) NOT NULL DEFAULT 'pending',
   payment_at DATE,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );

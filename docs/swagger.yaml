@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.CarbonElectricRequest:
     properties:
@@ -236,8 +237,16 @@ definitions:
       role_id:
         type: integer
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API for managing carbon ecosystem.
+  termsOfService: http://swagger.io/terms/
+  title: Carbon API
+  version: "1.0"
 paths:
   /carbon-electrics:
     get:
@@ -259,6 +268,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all carbon electrics
       tags:
       - CarbonElectrics
@@ -292,6 +303,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new carbon electric entry
       tags:
       - CarbonElectrics
@@ -333,6 +346,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a carbon electric entry
       tags:
       - CarbonElectrics
@@ -372,6 +387,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a carbon electric entry by ID
       tags:
       - CarbonElectrics
@@ -401,6 +418,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all carbon fuels
       tags:
       - CarbonFuels
@@ -434,6 +453,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new carbon fuel entry
       tags:
       - CarbonFuels
@@ -469,6 +490,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a carbon fuel entry
       tags:
       - CarbonFuels
@@ -501,6 +524,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get carbon fuel by ID
       tags:
       - CarbonFuels
@@ -551,6 +576,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all electric data
       tags:
       - Electrics
@@ -582,6 +609,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new electric record
       tags:
       - Electrics
@@ -614,6 +643,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete an electric record by ID
       tags:
       - Electrics
@@ -649,6 +680,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Get an electric record by ID
       tags:
       - Electrics
@@ -685,6 +718,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an electric record by ID
       tags:
       - Electrics
@@ -709,6 +744,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all fuels
       tags:
       - Fuels
@@ -743,6 +780,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new fuel
       tags:
       - Fuels
@@ -784,6 +823,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a fuel
       tags:
       - Fuels
@@ -823,6 +864,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a fuel by ID
       tags:
       - Fuels
@@ -867,6 +910,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing fuel
       tags:
       - Fuels
@@ -959,6 +1004,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all roles
       tags:
       - Roles
@@ -992,6 +1039,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new role
       tags:
       - Roles
@@ -1033,6 +1082,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a role
       tags:
       - Roles
@@ -1071,6 +1122,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a role by ID
       tags:
       - Roles
@@ -1115,6 +1168,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update a role
       tags:
       - Roles
@@ -1136,6 +1191,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Logout user
       tags:
       - Users
@@ -1155,6 +1212,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get user profile
       tags:
       - Users
@@ -1188,6 +1247,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update user profile
       tags:
       - Users
@@ -1224,7 +1285,14 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update user password
       tags:
       - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

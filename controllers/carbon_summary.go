@@ -25,8 +25,7 @@ func NewCarbonSummaryController(carbonSummaryRepository repositories.CarbonSumma
 // @Failure 500 {object} map[string]string
 // @Router /carbon-summary [get]
 func (ctrl *CarbonSummaryController) GetCarbonSummary(c echo.Context) error {
-	// userId := c.Get("user_id").(int)
-	userId := 2 // Hardcoded user ID for testing
+	userId := c.Get("user_id").(int)
 
 	carbonSummary, status, err := ctrl.CarbonSummaryRepository.GetCarbonSummary(userId)
 	if err != nil {
