@@ -4,14 +4,23 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
     types:
-      - closed 
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }} 
+  cancel-in-progress: true
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,16 +47,13 @@ jobs:
           go mod tidy
           go test ./...
 
-      - name: Check secrets
-        run: |
-          echo "GOOGLE_PROJECT_ID: persuasive-axe-317613"
-          echo "GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}"
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
 
-      - name: Debug environment
-        run: |
-          echo "Current shell: $SHELL"
-          echo "Commit SHA: $GITHUB_SHA"
-          echo "GO version: $(go version)"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
         run: |

@@ -11,10 +11,12 @@ var RedisClient *redis.Client
 
 func ConnectRedis() {
 	redisUrl := os.Getenv("REDIS_URL")
+	options, err := redis.ParseURL(redisUrl)
+	if err != nil {
+		log.Fatalf("Failed to parse Redis URL: %v", err)
+	}
 
-	RedisClient = redis.NewClient(&redis.Options{
-		Addr: redisUrl,
-	})
+	RedisClient = redis.NewClient(options)
 
 	log.Println("Connected to Redis")
 }
