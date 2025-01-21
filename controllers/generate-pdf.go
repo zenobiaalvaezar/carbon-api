@@ -43,7 +43,7 @@ type Fuel struct {
 	Value          float64 // This will represent the value for the bar height
 	X              float64 // X position for the bar
 	Y              float64 // Y position for the bar
-	TextX, TextY  float64
+	TextX, TextY   float64
 }
 
 type EmissionData struct {
@@ -139,13 +139,16 @@ func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
 		{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
 		{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
 		{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
+		{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
+		{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
+		{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
 	}
 
 	for i, fuel := range fuelData {
-		fuel.X = float64(i*60 + 10)           // X position for bars
-		fuel.Y = 200 - fuel.Value            // Y position based on value (bars go up from bottom)
-		fuel.TextX = fuel.X + 25             // Center text horizontally
-		fuel.TextY = fuel.Y + fuel.Value/2  // Center text vertically inside the bar
+		fuel.X = float64(i*90 + 40) 
+		fuel.Y = 200 - fuel.Value
+		fuel.TextX = fuel.X + 35 
+		fuel.TextY = fuel.Y + (fuel.Value / 2) 
 		fuelData[i] = fuel
 	}
 

@@ -68,7 +68,7 @@
             display: flex;
             justify-content: space-around;
             align-items: flex-end;
-            height: 200px;
+            height: 400x;
             margin-top: 20px;
         }
 
@@ -85,7 +85,6 @@
         .legend {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
         }
 
         .legend-item {
@@ -116,22 +115,22 @@
                     </div>
                 </div>
 
-                <div style="margin-left: 16px;">
+                <div style="margin-left: 24px;">
+                    <p style="margin-bottom: 12px; font-size: 14px;"><b>Electric</b></p>
                     <div>
-                        <svg class="chart-svg" width="400" height="200" style="display: block; margin: 0 auto;">
-                            <circle cx="100" cy="100" r="{{.EmissionData.NationalAvg}}" fill="#ccc" stroke="#ccc"
-                                stroke-width="2"></circle>
-                            <circle cx="300" cy="100" r="{{.EmissionData.ProvinceAvg}}" fill="#e74c3c" stroke="#e74c3c"
-                                stroke-width="2"></circle>
-                            <text x="100" y="95" text-anchor="middle" fill="#333" font-size="14">National</text>
-                            <text x="100" y="115" text-anchor="middle" fill="#333" font-size="12">Electricity</text>
-                            <text x="300" y="95" text-anchor="middle" fill="#fff" font-size="14">Province</text>
-                            <text x="300" y="115" text-anchor="middle" fill="#fff" font-size="12">Electricity</text>
+                        <svg class="chart-svg" width="400" height="250" style="display: block; margin: 0 auto;">
+                            <circle cx="100" cy="100" r="{{.EmissionData.NationalAvg}}" fill="#ccc" stroke="#ccc" stroke-width="2"></circle>
+                            <text x="100" y="100" text-anchor="middle" fill="#333" font-size="16" dy=".35em">
+                                {{.EmissionData.NationalAvg}}
+                            </text>
+                            
+                            <circle cx="300" cy="100" r="{{.EmissionData.ProvinceAvg}}" fill="#e74c3c" stroke="#e74c3c" stroke-width="2"></circle>
+                            <text x="300" y="100" text-anchor="middle" fill="#fff" font-size="16" dy=".35em">
+                                {{.EmissionData.ProvinceAvg}}
+                            </text>
                         </svg>
                     </div>
-
                     <div class="section">
-                        <p><strong>Legend:</strong></p>
                         <div class="legend">
                             <div class="legend-item">
                                 <div class="legend-color" style="background-color: #e74c3c;"></div>
@@ -147,18 +146,22 @@
             </div>
         </div>
 
-        <div class="section">
+        <div class="section" style="background-color: #f4f4f4; padding: 20px; border-radius: 15px;">
             <h2>Fuel Usage</h2>
             <p>Highlighting key fuel types in your ecosystem and their carbon emissions:</p>
-            <div style="display: flex; justify-content: center;">
-                <svg class="bar-chart-svg" width="600" height="200">
-                    {{range .FuelData}}
-                    <rect x="{{.X}}" y="{{.Y}}" width="50" height="{{.Value}}" />
-                    <text x="{{.TextX}}" y="190" text-anchor="middle" font-size="12">{{.Name}}</text>
-                    <text x="{{.TextX}}" y="{{.TextY}}" text-anchor="middle" font-size="12" fill="white">{{.Value}}</text>
-                    {{end}}
-                </svg>
-            </div>
+            <table role="presentation" width="100%" style="border-collapse: collapse; text-align: center;">
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <svg class="bar-chart-svg" width="900" height="250">
+                            {{range .FuelData}}
+                            <rect x="{{.X}}" y="{{.Y}}" width="70" height="{{.Value}}" fill="#4caf50" rx="10" ry="10" />
+                            <text x="{{.TextX}}" y="{{.TextY}}" text-anchor="middle" font-size="12" fill="white" dy="4">{{.Value}}</text>
+                            <text x="{{.TextX}}" y="220" text-anchor="middle" font-size="12" fill="#333">{{.Name}}</text>
+                            {{end}}
+                        </svg>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <div class="section">
