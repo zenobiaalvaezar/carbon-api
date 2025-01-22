@@ -59,6 +59,17 @@ func generateContentA() {
 	printResponse(resp)
 }
 
+// GeminiAPI godoc
+// @Summary Generate content based on the provided prompt
+// @Description Generate content related to carbon emission prediction and recommendations using Gemini AI
+// @Tags GeminiAPI
+// @Accept json
+// @Produce json
+// @Param requestBody body controllers.RequestPayload true "Request payload containing the prompt"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ai [post]
 func (ctrl *GeminiAPIController) GeminiAPI(c echo.Context) error {
 	var reqPayload RequestPayload
 	if err := c.Bind(&reqPayload); err != nil {
@@ -81,6 +92,17 @@ type OpenAIResponse struct {
 	} `json:"data"`
 }
 
+// GenerateImage godoc
+// @Summary Generate an image based on the provided prompt
+// @Description Generate an image based on the given prompt and send it via email
+// @Tags GeminiAPI
+// @Accept json
+// @Produce json
+// @Param requestBody body controllers.GenerateImageRequest true "Request payload containing the prompt and image size"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /ai/generate-image [post]
 func (ctrl *GeminiAPIController) GenerateImage(c echo.Context) error {
 	// Parse request body
 	var req GenerateImageRequest

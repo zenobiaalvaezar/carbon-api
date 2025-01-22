@@ -126,6 +126,16 @@ func generateContent() string {
 	return recommendations
 }
 
+// PdfHandler godoc
+// @Summary Generate a PDF report for carbon emissions
+// @Description Generate a PDF report based on emission data and send it via email
+// @Tags Reports
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "PDF generated and sent to fr081938@gmail.com"
+// @Failure 500 {object} map[string]string "Error generating PDF or sending email"
+// @Security BearerAuth
+// @Router /generate-pdf [post]
 func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
 	go func() {
 		tmplPath := filepath.Join("templates", "report.html")
@@ -183,6 +193,16 @@ func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "PDF generated and sent to fr081938@gmail.com")
 }
 
+// PdfHandlerSummary godoc
+// @Summary Generate a summary PDF report
+// @Description Generate a summary PDF report with emission data and AI-generated predictions, then send it via email
+// @Tags Reports
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "PDF generated and sent to fr081938@gmail.com"
+// @Failure 500 {object} map[string]string "Error generating PDF or sending email"
+// @Security BearerAuth
+// @Router /generate-pdf-summary [post]
 func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 	tmplPath := filepath.Join("templates", "summary.html")
 	tmpl, err := template.ParseFiles(tmplPath)
