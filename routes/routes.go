@@ -159,6 +159,15 @@ func Init(e *echo.Echo) {
 	tr.PUT("/:id", treeController.UpdateTree)
 	tr.DELETE("/:id", treeController.DeleteTree)
 
+	pdfGeneratorController := controllers.NewGeneratePdfController()
+
+	e.POST("/generate-pdf", pdfGeneratorController.PdfHandler)
+	e.POST("/generate-pdf-summary", pdfGeneratorController.PdfHandlerSummary)
+
+	newGeminiAPIController := controllers.NewGeminiAPIController()
+	e.POST("/ai", newGeminiAPIController.GeminiAPI)
+	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 }

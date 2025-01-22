@@ -6,6 +6,7 @@ import (
 	"carbon-api/repositories"
 	"carbon-api/utils"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -71,8 +72,15 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 	}
 	// Kirim email notifikasi
 	subject := "Welcome to Carbon App!"
-	body := fmt.Sprintf("Hi %s,\n\nWelcome to Carbon App! Your account has been successfully created.\n\nThank you!", response.Name)
-	if err := utils.SendEmail(response.Email, subject, body); err != nil {
+	data := map[string]string{
+		"Name": response.Name,
+	}
+
+	emailBody, err := utils.RenderTemplate(data, "templates/regist_success.html")
+	if err != nil {
+		log.Fatalf("Error rendering template: %v", err)
+	}
+	if err := utils.SendEmail(response.Email, subject, emailBody); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to send email"})
 	}
 
