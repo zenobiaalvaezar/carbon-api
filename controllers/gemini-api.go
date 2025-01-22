@@ -70,20 +70,6 @@ func (ctrl *GeminiAPIController) GeminiAPI(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
-func initGenAIClient() (*genai.Client, error) {
-	apiKey := os.Getenv("GEMINI_API_KEY")
-	if apiKey == "" {
-		return nil, fmt.Errorf("GEMINI_API_KEY environment variable is not set")
-	}
-
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
 type GenerateImageRequest struct {
 	Prompt string `json:"prompt" validate:"required"`
 	Size   string `json:"size" validate:"required,oneof=256x256 512x512 1024x1024"`
@@ -102,57 +88,74 @@ func (ctrl *GeminiAPIController) GenerateImage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 
-	// Call OpenAI API
+	c.Response().Header().Set("Content-Type", "text/plain")
+	c.Response().WriteHeader(http.StatusOK)
+
+	_, _ = c.Response().Write([]byte("Generating image... Please wait.\n"))
+	c.Response().Flush()
+
 	client := resty.New()
 	apiKey := os.Getenv("OPENAI_API_KEY")
 
-	prompt := "Generate an image of a user profile card with a forest conservation theme, featuring a clean and professional design. Key elements: a prominent badge displaying 'pelindung hutan,' two metrics ('donation_tree': 2 trees and 'carbon_tree': 1 unit of carbon), user name 'Fathur Rohman,' and user ID '0012.' The design should be modern and minimalist, incorporating elements like leaves, trees, or a stylized forest backdrop."
+	prompt := "a badge with the name 'Fathur Rohman' and a label 'Pelindung Hutan' (tree protector)"
 	response := OpenAIResponse{}
 	resp, err := client.R().
 		SetHeader("Authorization", "Bearer "+apiKey).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]interface{}{
-			"prompt": prompt,
-			"n":      1,
-			"size":   "1024x1024",
+			"model":   "dall-e-3",
+			"prompt":  prompt,
+			"n":       1,
+			"size":    "1024x1024",
+			"quality": "standard",
 		}).
 		SetResult(&response).
 		Post("https://api.openai.com/v1/images/generations")
 
 	if err != nil || resp.StatusCode() != http.StatusOK {
-		errorMessage := "Failed to generate image"
-		if resp.StatusCode() != http.StatusOK {
-			errorMessage = resp.String()
-		}
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": errorMessage})
+		_, _ = c.Response().Write([]byte("Failed to generate image.\n"))
+		c.Response().Flush()
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to generate image"})
 	}
 
 	imageURL := response.Data[0].URL
 
-	// Download the image
+	_, _ = c.Response().Write([]byte("Downloading image...\n"))
+	c.Response().Flush()
+
 	imageResp, err := http.Get(imageURL)
 	if err != nil || imageResp.StatusCode != http.StatusOK {
+		_, _ = c.Response().Write([]byte("Failed to download image.\n"))
+		c.Response().Flush()
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to download image"})
 	}
 	defer imageResp.Body.Close()
 
 	imageData, err := io.ReadAll(imageResp.Body)
 	if err != nil {
+		_, _ = c.Response().Write([]byte("Failed to read image data.\n"))
+		c.Response().Flush()
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to read image data"})
 	}
 
-	// Email recipient details
 	subject := "Generated Image"
 	body := fmt.Sprintf("Here is the image you requested for prompt: %s", req.Prompt)
 
-	// Send email with image attachment
+	_, _ = c.Response().Write([]byte("Sending email...\n"))
+	c.Response().Flush()
+
 	err = utils.SendEmailWithAttachment("fr081938@gmail.com", subject, body, imageData)
 	if err != nil {
+		_, _ = c.Response().Write([]byte("Failed to send email.\n"))
+		c.Response().Flush()
 		fmt.Print(err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to send email"})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{"message": "Image generated and sent successfully!"})
+	_, _ = c.Response().Write([]byte("Image generated and sent successfully!\n"))
+	c.Response().Flush()
+
+	return nil
 }
 
 func printResponse(resp *genai.GenerateContentResponse) {
