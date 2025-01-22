@@ -80,7 +80,14 @@ func (repo *roleRepository) UpdateRole(id int, roleRequest models.RoleRequest) (
 }
 
 func (repo *roleRepository) DeleteRole(id int) (int, error) {
-	result := repo.DB.Delete(&models.Role{}, id)
+	// check if role exists in user
+	var user models.User
+	result := repo.DB.Where("role_id = ?", id).First(&user)
+	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return http.StatusConflict, errors.New("Role is still being used by user")
+	}
+
+	result = repo.DB.Delete(&models.Role{}, id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return http.StatusNotFound, errors.New("Role not found")
 	}

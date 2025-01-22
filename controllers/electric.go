@@ -142,6 +142,7 @@ func (ctrl *ElectricController) UpdateElectric(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
 
+	electric.ID = id
 	cacheStatus, cacheErr := ctrl.ElectricCache.UpdateElectric(electric)
 	if cacheErr != nil {
 		return c.JSON(cacheStatus, map[string]string{"message": cacheErr.Error()})

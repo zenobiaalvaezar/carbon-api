@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +19,12 @@ type PaymentRepository interface {
 }
 
 type paymentRepository struct {
-	DB *gorm.DB
+	DB              *gorm.DB
+	MongoCollection *mongo.Collection
 }
 
-func NewPaymentRepository(DB *gorm.DB) *paymentRepository {
-	return &paymentRepository{DB}
+func NewPaymentRepository(DB *gorm.DB, MongoCollection *mongo.Collection) *paymentRepository {
+	return &paymentRepository{DB, MongoCollection}
 }
 
 func (r *paymentRepository) CreatePayment(payment models.PaymentRequest) (models.PaymentResponse, int, error) {
@@ -36,6 +38,13 @@ func (r *paymentRepository) CreatePayment(payment models.PaymentRequest) (models
 	r.DB.Where("id = ?", transaction.UserID).First(&user)
 	if user.ID == 0 {
 		return models.PaymentResponse{}, http.StatusNotFound, errors.New("User not found")
+	}
+
+	// check payment method is exists in payment method list
+	paymentMethodRepository := NewPaymentMethodRepository(r.MongoCollection)
+	_, _, err := paymentMethodRepository.GetPaymentMethodByCode(payment.PaymentMethod)
+	if err != nil {
+		return models.PaymentResponse{}, http.StatusNotFound, err
 	}
 
 	transaction.PaymentMethod = payment.PaymentMethod
