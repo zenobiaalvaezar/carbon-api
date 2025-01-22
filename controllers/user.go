@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -129,7 +130,8 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 		"role":    roleName,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte("secret"))
+	secret := os.Getenv("JWT_SECRET")
+	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
@@ -248,6 +250,27 @@ func (ctrl *UserController) LogoutUser(c echo.Context) error {
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	if tokenString == authHeader {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token format"})
+	}
+
+	// logout and destroy JWT token so user can't use it anymore
+	secret := os.Getenv("JWT_SECRET")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token"})
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
+	}
+
+	// Set expiration time to now
+	claims["exp"] = time.Now().Unix()
+	_, err = token.SignedString([]byte(secret))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logout successful"})

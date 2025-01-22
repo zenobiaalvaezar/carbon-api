@@ -111,12 +111,9 @@ func (cache *electricCache) CreateElectric(electric models.Electric) (int, error
 }
 
 func (cache *electricCache) UpdateElectric(electric models.Electric) (int, error) {
-	exists, err := cache.client.HExists(electricKey, strconv.Itoa(electric.ID)).Result()
+	_, err := cache.client.HExists(electricKey, strconv.Itoa(electric.ID)).Result()
 	if err != nil {
 		return http.StatusInternalServerError, err
-	}
-	if !exists {
-		return http.StatusNotFound, errors.New("electric record not found")
 	}
 
 	data, err := serializeElectric(electric)

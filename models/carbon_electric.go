@@ -17,6 +17,10 @@ type CarbonElectricResponse struct {
 	UserID           int     `json:"user_id"`
 	UserName         string  `json:"user_name"`
 	UserEmail        string  `json:"user_email"`
+	ElectricID       int     `json:"electric_id"`
+	Province         string  `json:"province"`
+	Price            float64 `json:"price"`
+	Unit             string  `json:"unit"`
 	UsageType        string  `json:"usage_type"`
 	UsageAmount      float64 `json:"usage_amount"`
 	TotalConsumption float64 `json:"total_consumption"`
@@ -25,10 +29,8 @@ type CarbonElectricResponse struct {
 }
 
 type CarbonElectricRequest struct {
-	UserID         int     `json:"user_id" validate:"required"`
-	ElectricID     int     `json:"electric_id" validate:"required"`
-	UsageType      string  `json:"usage_type" validate:"required,oneof=consumption rupiah"`
-	UsageAmount    float64 `json:"usage_amount" validate:"required,gt=0"`
-	Price          float64 `json:"price" validate:"required,gt=0"`
-	EmissionFactor float64 `json:"emission_factor" validate:"required,gt=0"`
+	UserID      int     `json:"user_id" validate:"required"`
+	ElectricID  int     `json:"electric_id" validate:"required"`
+	UsageType   string  `json:"usage_type" validate:"required,oneof=consumption rupiah"`
+	UsageAmount float64 `json:"usage_amount" validate:"required,gt=0"`
 }

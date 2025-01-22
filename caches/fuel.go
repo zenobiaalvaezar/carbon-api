@@ -114,12 +114,9 @@ func (cache *fuelCache) CreateFuel(fuel models.Fuel) (int, error) {
 
 func (cache *fuelCache) UpdateFuel(fuel models.Fuel) (int, error) {
 	// Check if fuel exists
-	exists, err := cache.client.HExists(key, strconv.Itoa(fuel.ID)).Result()
+	_, err := cache.client.HExists(key, strconv.Itoa(fuel.ID)).Result()
 	if err != nil {
 		return http.StatusInternalServerError, err
-	}
-	if !exists {
-		return http.StatusNotFound, errors.New("fuel not found")
 	}
 
 	data, err := serializeFuel(fuel)
