@@ -117,21 +117,21 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid credentials"})
 	}
 
+	// Ambil nama role berdasarkan RoleID
+	roleName, err := ctrl.UserRepository.GetRoleNameByID(user.RoleID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to retrieve role name"})
+	}
+
 	// Generate token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
-		"role_id": user.RoleID,
+		"role":    roleName,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte("secret"))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
-	}
-
-	// Ambil nama role berdasarkan RoleID
-	roleName, err := ctrl.UserRepository.GetRoleNameByID(user.RoleID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to retrieve role name"})
 	}
 
 	response := map[string]interface{}{

@@ -49,8 +49,8 @@ func CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// Check User Admin
-func CheckUserAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+// Check Role Admin
+func CheckRoleAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, ok := c.Get("user").(jwt.MapClaims)
 		if !ok {
@@ -58,7 +58,7 @@ func CheckUserAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		role, ok := claims["role"].(string)
-		if !ok || role != "Admin" {
+		if !ok || role != "admin" {
 			return echo.NewHTTPError(http.StatusForbidden, "Access restricted to Admin users")
 		}
 
@@ -66,8 +66,8 @@ func CheckUserAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// Check User Customer
-func CheckUserCustomer(next echo.HandlerFunc) echo.HandlerFunc {
+// Check Role Customer
+func CheckRoleCustomer(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, ok := c.Get("user").(jwt.MapClaims)
 		if !ok {
@@ -75,7 +75,7 @@ func CheckUserCustomer(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		role, ok := claims["role"].(string)
-		if !ok || role != "Customer" {
+		if !ok || role != "customer" {
 			return echo.NewHTTPError(http.StatusForbidden, "Access restricted to Customer users")
 		}
 

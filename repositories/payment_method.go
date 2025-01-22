@@ -63,7 +63,7 @@ func (pmr *paymentMethodRepository) GetPaymentMethodByCode(code string) (models.
 	err := pmr.MongoCollection.FindOne(ctx, bson.M{"code": code}).Decode(&paymentMethod)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return models.PaymentMethod{}, http.StatusNotFound, err
+			return models.PaymentMethod{}, http.StatusNotFound, errors.New("payment method not found")
 		}
 		return models.PaymentMethod{}, http.StatusInternalServerError, err
 	}
