@@ -188,6 +188,13 @@ definitions:
       password:
         type: string
     type: object
+  models.PaymentMethod:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+    type: object
   models.PaymentRequest:
     properties:
       payment_method:
@@ -1308,6 +1315,147 @@ paths:
       summary: Login user
       tags:
       - Auth
+  /payment-methods:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all payment methods from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PaymentMethod'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all payment methods
+      tags:
+      - PaymentMethods
+    post:
+      consumes:
+      - application/json
+      description: Create a new payment method by providing the necessary details
+      parameters:
+      - description: New Payment Method
+        in: body
+        name: paymentMethod
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentMethod'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.PaymentMethod'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new payment method
+      tags:
+      - PaymentMethods
+  /payment-methods/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing payment method by its ID
+      parameters:
+      - description: Payment Method ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a payment method
+      tags:
+      - PaymentMethods
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing payment method by its ID
+      parameters:
+      - description: Payment Method ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Payment Method
+        in: body
+        name: paymentMethod
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentMethod'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaymentMethod'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing payment method
+      tags:
+      - PaymentMethods
   /payments:
     post:
       consumes:
