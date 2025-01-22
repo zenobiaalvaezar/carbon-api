@@ -11,7 +11,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   phone VARCHAR(255),
   address TEXT,
-  created_at DATE NOT NULL,
+  created_at TIMESTAMP NOT NULL,
   FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
@@ -97,10 +97,10 @@ CREATE TABLE transactions (
   id SERIAL PRIMARY KEY,
   user_id INT NOT NULL,
   total_price FLOAT NOT NULL,
-  created_at DATE NOT NULL,
+  created_at TIMESTAMP NOT NULL,
   payment_method VARCHAR(255),
   payment_status VARCHAR(255) NOT NULL DEFAULT 'pending',
-  payment_at DATE,
+  payment_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

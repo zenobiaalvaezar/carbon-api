@@ -25,6 +25,7 @@ func NewTransactionController(TransactionRepository repositories.TransactionRepo
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
+// @Router /transactions [get]
 func (controller *TransactionController) GetAllTransactions(c echo.Context) error {
 	userId := c.Get("user_id").(int)
 	transactions, statusCode, err := controller.TransactionRepository.GetAllTransactions(userId)
