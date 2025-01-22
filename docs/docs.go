@@ -1481,6 +1481,11 @@ const docTemplate = `{
         },
         "/payment-methods": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Fetch all payment methods from the database",
                 "consumes": [
                     "application/json"
@@ -1514,6 +1519,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new payment method by providing the necessary details",
                 "consumes": [
                     "application/json"
@@ -1566,6 +1576,11 @@ const docTemplate = `{
         },
         "/payment-methods/{id}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update the details of an existing payment method by its ID",
                 "consumes": [
                     "application/json"
@@ -1632,6 +1647,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an existing payment method by its ID",
                 "consumes": [
                     "application/json"

@@ -23,6 +23,7 @@ func NewPaymentMethodController(paymentMethodRepository repositories.PaymentMeth
 // @Produce json
 // @Success 200 {array} models.PaymentMethod
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /payment-methods [get]
 func (ctrl *PaymentMethodController) GetAllPaymentMethods(c echo.Context) error {
 	paymentMethods, status, err := ctrl.PaymentMethodRepository.GetAllPaymentMethods()
@@ -43,6 +44,7 @@ func (ctrl *PaymentMethodController) GetAllPaymentMethods(c echo.Context) error 
 // @Success 201 {object} models.PaymentMethod
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /payment-methods [post]
 func (ctrl *PaymentMethodController) CreatePaymentMethod(c echo.Context) error {
 	var paymentMethod models.PaymentMethod
@@ -68,6 +70,7 @@ func (ctrl *PaymentMethodController) CreatePaymentMethod(c echo.Context) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /payment-methods/{id} [put]
 func (ctrl *PaymentMethodController) UpdatePaymentMethod(c echo.Context) error {
 	id := c.Param("id")
@@ -93,6 +96,7 @@ func (ctrl *PaymentMethodController) UpdatePaymentMethod(c echo.Context) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /payment-methods/{id} [delete]
 func (ctrl *PaymentMethodController) DeletePaymentMethod(c echo.Context) error {
 	id := c.Param("id")
