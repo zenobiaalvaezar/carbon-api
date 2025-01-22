@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/smtp"
 	"os"
+	"text/template"
 )
 
 func SendEmail(to string, subject string, body string) error {
@@ -107,4 +108,18 @@ func SendEmailWithPdfAttachment(to, subject, body string, pdfData []byte) error 
 		return err
 	}
 	return nil
+}
+
+func RenderTemplate(data map[string]string, htmlTemplate string) (string, error) {
+	tmpl, err := template.ParseFiles(htmlTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	var rendered bytes.Buffer
+	if err := tmpl.Execute(&rendered, data); err != nil {
+		return "", err
+	}
+
+	return rendered.String(), nil
 }
