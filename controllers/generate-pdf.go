@@ -127,60 +127,58 @@ func generateContent() string {
 }
 
 func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
-	tmplPath := filepath.Join("templates", "report.html")
-	tmpl, err := template.ParseFiles(tmplPath)
-	if err != nil {
-		log.Printf("Error loading template: %v", err)
-		return c.String(http.StatusInternalServerError, "Failed to load template")
-	}
+	go func() {
+		tmplPath := filepath.Join("templates", "report.html")
+		tmpl, err := template.ParseFiles(tmplPath)
+		if err != nil {
+			log.Printf("Error loading template: %v", err)
+		}
 
-	fuelData := []Fuel{
-		{ID: 1, Category: "Bahan Bakar Cair", Name: "Pertamax Plus/Turbo", EmissionFactor: 2.368, Price: 13250, Unit: "Liter", Value: 150},
-		{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-		{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-		{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
-		{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-		{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-		{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
-	}
+		fuelData := []Fuel{
+			{ID: 1, Category: "Bahan Bakar Cair", Name: "Pertamax Plus/Turbo", EmissionFactor: 2.368, Price: 13250, Unit: "Liter", Value: 150},
+			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
+			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
+			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
+			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
+			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
+			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
+		}
 
-	for i, fuel := range fuelData {
-		fuel.X = float64(i*90 + 40) 
-		fuel.Y = 200 - fuel.Value
-		fuel.TextX = fuel.X + 35 
-		fuel.TextY = fuel.Y + (fuel.Value / 2) 
-		fuelData[i] = fuel
-	}
+		for i, fuel := range fuelData {
+			fuel.X = float64(i*90 + 40)
+			fuel.Y = 200 - fuel.Value
+			fuel.TextX = fuel.X + 35
+			fuel.TextY = fuel.Y + (fuel.Value / 2)
+			fuelData[i] = fuel
+		}
 
-	var renderedHTML bytes.Buffer
-	data := ReportData{
-		Address:    "123 Greenway Blvd, Ontario",
-		ReportDate: time.Now().Format("January 2, 2006"),
-		Emission:   "CO₂ Emission",
-		FuelData:   fuelData,
-		EmissionData: EmissionData{
-			NationalAvg: 100,
-			ProvinceAvg: 80,
-		},
-	}
+		var renderedHTML bytes.Buffer
+		data := ReportData{
+			Address:    "123 Greenway Blvd, Ontario",
+			ReportDate: time.Now().Format("January 2, 2006"),
+			Emission:   "CO₂ Emission",
+			FuelData:   fuelData,
+			EmissionData: EmissionData{
+				NationalAvg: 100,
+				ProvinceAvg: 80,
+			},
+		}
 
-	if err := tmpl.Execute(&renderedHTML, data); err != nil {
-		log.Printf("Error rendering template: %v", err)
-		return c.String(http.StatusInternalServerError, "Failed to render template")
-	}
+		if err := tmpl.Execute(&renderedHTML, data); err != nil {
+			log.Printf("Error rendering template: %v", err)
+		}
 
-	pdfData, err := utils.HtmlToPDF(renderedHTML.String())
-	if err != nil {
-		log.Printf("Error generating PDF: %v", err)
-		return c.String(http.StatusInternalServerError, "Failed to generate PDF")
-	}
+		pdfData, err := utils.HtmlToPDF(renderedHTML.String())
+		if err != nil {
+			log.Printf("Error generating PDF: %v", err)
+		}
 
-	subject := "Your Generated PDF Report"
-	body := "Please find your PDF report attached."
-	if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, body, pdfData); err != nil {
-		log.Printf("Error sending email: %v", err)
-		return c.String(http.StatusInternalServerError, "Failed to send email")
-	}
+		subject := "Your Generated PDF Report"
+		body := "Please find your PDF report attached."
+		if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, body, pdfData); err != nil {
+			log.Printf("Error sending email: %v", err)
+		}
+	}()
 
 	return c.String(http.StatusOK, "PDF generated and sent to fr081938@gmail.com")
 }
