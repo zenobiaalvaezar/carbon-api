@@ -118,7 +118,6 @@ func Init(e *echo.Echo) {
 
 	ce := e.Group("/carbon-electrics")
 	ce.Use(middlewares.CheckAuth)
-	ce.Use(middlewares.CheckRoleCustomer)
 	ce.GET("", carbonElectricController.GetAllCarbonElectrics)
 	ce.GET("/:id", carbonElectricController.GetCarbonElectricByID)
 	ce.POST("", carbonElectricController.CreateCarbonElectric)
