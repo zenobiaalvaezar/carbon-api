@@ -67,16 +67,11 @@ func Init(e *echo.Echo) {
 
 	// Protected routes for user profile
 	userGroup := e.Group("/users")
-	userGroup.Use(middlewares.CheckAuth) // Gunakan middleware CheckAuth
+	userGroup.Use(middlewares.CheckAuth)
 	userGroup.GET("/profile", userController.GetProfile)
-	userGroup.Use(middlewares.CheckAuth)
 	userGroup.POST("/logout", userController.LogoutUser)
-
-	userGroup.Use(middlewares.CheckAuth)
 	userGroup.PUT("/profile", userController.UpdateProfile)
-
-	userGroup.Use(middlewares.CheckAuth)
-	userGroup.PUT("/update-password", userController.UpdatePassword)
+	userGroup.PUT("/password", userController.UpdatePassword)
 
 	// electric
 	electricRepository := repositories.NewElectricRepository(config.DB)
@@ -145,5 +140,34 @@ func Init(e *echo.Echo) {
 	pm.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
 	pm.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
 
+	// Routes for TreeCategory
+	ct := e.Group("/tree-categories")
+	ct.GET("", controllers.GetAllTreeCategories)
+	ct.GET("/:id", controllers.GetTreeCategoryByID)
+	ct.POST("", controllers.CreateTreeCategory)
+	ct.PUT("/:id", controllers.UpdateTreeCategory)
+	ct.DELETE("/:id", controllers.DeleteTreeCategory)
+
+	// Tree routes
+	treeRepository := repositories.NewTreeRepository(config.DB)
+	treeCache := caches.NewTreeCache(config.RedisClient)
+	treeController := controllers.NewTreeController(treeRepository, treeCache)
+	tr := e.Group("/trees")
+	tr.GET("", treeController.GetAllTrees)
+	tr.GET("/:id", treeController.GetTreeByID)
+	tr.POST("", treeController.CreateTree)
+	tr.PUT("/:id", treeController.UpdateTree)
+	tr.DELETE("/:id", treeController.DeleteTree)
+
+	pdfGeneratorController := controllers.NewGeneratePdfController()
+
+	e.POST("/generate-pdf", pdfGeneratorController.PdfHandler)
+	e.POST("/generate-pdf-summary", pdfGeneratorController.PdfHandlerSummary)
+
+	newGeminiAPIController := controllers.NewGeminiAPIController()
+	e.POST("/ai", newGeminiAPIController.GeminiAPI)
+	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 }

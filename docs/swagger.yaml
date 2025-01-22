@@ -1,4 +1,32 @@
 definitions:
+  controllers.GenerateImageRequest:
+    properties:
+      prompt:
+        type: string
+      size:
+        enum:
+        - 256x256
+        - 512x512
+        - 1024x1024
+        type: string
+    required:
+    - prompt
+    - size
+    type: object
+  controllers.RequestPayload:
+    properties:
+      prompt:
+        type: string
+    type: object
+  models.AddCartRequest:
+    properties:
+      quantity:
+        type: integer
+      tree_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   models.CarbonElectricRequest:
     properties:
       electric_id:
@@ -141,12 +169,45 @@ definitions:
       unit:
         type: string
     type: object
+  models.GetCartsResponse:
+    properties:
+      id:
+        type: integer
+      price:
+        type: number
+      quantity:
+        type: integer
+      tree_name:
+        type: string
+    type: object
   models.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
+    type: object
+  models.PaymentRequest:
+    properties:
+      payment_method:
+        type: string
+      transaction_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  models.PaymentResponse:
+    properties:
+      payment_amount:
+        type: number
+      payment_method:
+        type: string
+      payment_status:
+        type: string
+      redirect_url:
+        type: string
+      transaction_id:
+        type: integer
     type: object
   models.RegisterRequest:
     properties:
@@ -176,6 +237,21 @@ definitions:
       phone:
         type: string
     type: object
+  models.ReportSummary:
+    properties:
+      badge_status:
+        type: string
+      carbon_tree:
+        type: integer
+      donation_tree:
+        type: integer
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
   models.Role:
     properties:
       id:
@@ -185,6 +261,45 @@ definitions:
     type: object
   models.RoleRequest:
     properties:
+      name:
+        type: string
+    type: object
+  models.Transaction:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      payment_at:
+        type: string
+      payment_method:
+        type: string
+      payment_status:
+        type: string
+      total_price:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  models.Tree:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+      tree_category_id:
+        type: integer
+    type: object
+  models.TreeCategory:
+    properties:
+      id:
+        type: integer
       name:
         type: string
     type: object
@@ -246,6 +361,79 @@ info:
   title: Carbon API
   version: "1.0"
 paths:
+  /ai:
+    post:
+      consumes:
+      - application/json
+      description: Generate content related to carbon emission prediction and recommendations
+        using Gemini AI
+      parameters:
+      - description: Request payload containing the prompt
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RequestPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate content based on the provided prompt
+      tags:
+      - GeminiAPI
+  /ai/generate-image:
+    post:
+      consumes:
+      - application/json
+      description: Generate an image based on the given prompt and send it via email
+      parameters:
+      - description: Request payload containing the prompt and image size
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.GenerateImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate an image based on the provided prompt
+      tags:
+      - GeminiAPI
   /carbon-electrics:
     get:
       consumes:
@@ -555,6 +743,129 @@ paths:
       summary: Get carbon summary
       tags:
       - CarbonSummary
+  /carts:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all cart items for a specific user by their user ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetCartsResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all carts for a specific user
+      tags:
+      - Carts
+    post:
+      consumes:
+      - application/json
+      description: Add a specified tree item to the user's cart
+      parameters:
+      - description: Add Tree to Cart Request
+        in: body
+        name: addCartRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add a tree to the cart
+      tags:
+      - Carts
+  /carts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specified tree item from the user's cart by ID
+      parameters:
+      - description: Cart ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a tree from the cart
+      tags:
+      - Carts
   /electrics:
     get:
       consumes:
@@ -913,6 +1224,53 @@ paths:
       summary: Update an existing fuel
       tags:
       - Fuels
+  /generate-pdf:
+    post:
+      consumes:
+      - application/json
+      description: Generate a PDF report based on emission data and send it via email
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PDF generated and sent to fr081938@gmail.com
+          schema:
+            type: string
+        "500":
+          description: Error generating PDF or sending email
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate a PDF report for carbon emissions
+      tags:
+      - Reports
+  /generate-pdf-summary:
+    post:
+      consumes:
+      - application/json
+      description: Generate a summary PDF report with emission data and AI-generated
+        predictions, then send it via email
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PDF generated and sent to fr081938@gmail.com
+          schema:
+            type: string
+        "500":
+          description: Error generating PDF or sending email
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate a summary PDF report
+      tags:
+      - Reports
   /login:
     post:
       consumes:
@@ -948,6 +1306,95 @@ paths:
       summary: Login user
       tags:
       - Auth
+  /payments:
+    post:
+      consumes:
+      - application/json
+      description: Create a new payment request for a user, specifying the transaction
+        ID, payment method, and other details
+      parameters:
+      - description: Payment Request
+        in: body
+        name: paymentRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaymentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new payment
+      tags:
+      - Payments
+  /payments/verify/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Verify the status of a payment transaction by its transaction ID
+        and status (either success or failed)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payment Status
+        enum:
+        - success
+        - failed
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Verify a payment transaction
+      tags:
+      - Payments
   /register:
     post:
       consumes:
@@ -982,6 +1429,36 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /reports/summary:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a summary report for the authenticated user, including
+        user details and statistics such as carbon trees and donation trees
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReportSummary'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get the report summary for a user
+      tags:
+      - Reports
   /roles:
     get:
       consumes:
@@ -1171,6 +1648,378 @@ paths:
       summary: Update a role
       tags:
       - Roles
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction for the authenticated user
+      parameters:
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add a new transaction
+      tags:
+      - Transactions
+  /tree-categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all tree categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TreeCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all tree categories
+      tags:
+      - TreeCategories
+    post:
+      consumes:
+      - application/json
+      description: Create a new tree category with a unique name
+      parameters:
+      - description: Tree Category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.TreeCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.TreeCategory'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tree category
+      tags:
+      - TreeCategories
+  /tree-categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tree category by ID
+      parameters:
+      - description: Tree Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a tree category
+      tags:
+      - TreeCategories
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a tree category by its ID
+      parameters:
+      - description: Tree Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TreeCategory'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get tree category by ID
+      tags:
+      - TreeCategories
+    put:
+      consumes:
+      - application/json
+      description: Update a tree category by ID
+      parameters:
+      - description: Tree Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tree Category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.TreeCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TreeCategory'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing tree category
+      tags:
+      - TreeCategories
+  /trees:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all trees, checking consistency with the cache
+        and database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tree'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all trees
+      tags:
+      - Trees
+    post:
+      consumes:
+      - application/json
+      description: Add a new tree to the database and cache
+      parameters:
+      - description: Tree data
+        in: body
+        name: tree
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tree'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Tree'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tree
+      tags:
+      - Trees
+  /trees/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a tree by ID from the database and cache
+      parameters:
+      - description: Tree ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a tree
+      tags:
+      - Trees
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific tree by ID, checking cache first, then the
+        database
+      parameters:
+      - description: Tree ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tree'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get tree by ID
+      tags:
+      - Trees
+    put:
+      consumes:
+      - application/json
+      description: Modify an existing tree by ID and update the cache
+      parameters:
+      - description: Tree ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tree data
+        in: body
+        name: tree
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tree'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tree'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing tree
+      tags:
+      - Trees
   /users/logout:
     post:
       description: Invalidate the user's authentication token

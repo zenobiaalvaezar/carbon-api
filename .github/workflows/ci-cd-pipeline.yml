@@ -87,3 +87,21 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --timeout 10m
+              --set-secrets \
+                "API_PORT=projects/persuasive-axe-317613/secrets/API_PORT/versions/latest" \
+                "PORT=projects/persuasive-axe-317613/secrets/PORT/versions/latest" \
+                "BASE_URL=projects/persuasive-axe-317613/secrets/BASE_URL/versions/latest" \
+                "DATABASE_URL=projects/persuasive-axe-317613/secrets/DATABASE_URL/versions/latest" \
+                "REDIS_URL=projects/persuasive-axe-317613/secrets/REDIS_URL/versions/latest" \
+                "MONGODB_URI=projects/persuasive-axe-317613/secrets/MONGODB_URI/versions/latest" \
+                "MONGO_DATABASE=projects/persuasive-axe-317613/secrets/MONGO_DATABASE/versions/latest" \
+                "MONGO_COLLECTION=projects/persuasive-axe-317613/secrets/MONGO_COLLECTION/versions/latest" \
+                "SMTP_HOST=projects/persuasive-axe-317613/secrets/SMTP_HOST/versions/latest" \
+                "SMTP_PORT=projects/persuasive-axe-317613/secrets/SMTP_PORT/versions/latest" \
+                "SMTP_USERNAME=projects/persuasive-axe-317613/secrets/SMTP_USERNAME/versions/latest" \
+                "SMTP_PASSWORD=projects/persuasive-axe-317613/secrets/SMTP_PASSWORD/versions/latest" \
+                "JWT_SECRET=projects/persuasive-axe-317613/secrets/JWT_SECRET/versions/latest" \
+                "XENDIT_API_URL=projects/persuasive-axe-317613/secrets/XENDIT_API_URL/versions/latest" \
+                "XENDIT_SECRET_KEY=projects/persuasive-axe-317613/secrets/XENDIT_SECRET_KEY/versions/latest" \
+                "GEMINI_API_KEY=projects/persuasive-axe-317613/secrets/GEMINI_API_KEY/versions/latest" \
+                "OPENAI_API_KEY=projects/persuasive-axe-317613/secrets/OPENAI_API_KEY/versions/latest"
