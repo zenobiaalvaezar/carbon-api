@@ -18,7 +18,8 @@ func SendEmail(to string, subject string, body string) error {
 	from := smtpUser
 	auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 
-	message := []byte(fmt.Sprintf("Subject: %s\r\n\r\n%s", subject, body))
+	headers := fmt.Sprintf("MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nSubject: %s\r\n\r\n", subject)
+	message := []byte(headers + body)
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
 
 	err := smtp.SendMail(addr, auth, from, []string{to}, message)
