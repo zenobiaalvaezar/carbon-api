@@ -10,7 +10,7 @@ import (
 
 type CartRepository interface {
 	GetAllCart(userID int) ([]models.GetCartsResponse, int, error)
-	AddCart(cart models.AddCartRequest) (int, error)
+	AddCart(cart models.AddCartRequest) (models.Cart, int, error)
 	DeleteCart(cartID int) (int, error)
 }
 
@@ -52,17 +52,17 @@ func (r *cartRepository) GetAllCart(userID int) ([]models.GetCartsResponse, int,
 	return response, http.StatusOK, nil
 }
 
-func (r *cartRepository) AddCart(cart models.AddCartRequest) (int, error) {
+func (r *cartRepository) AddCart(cart models.AddCartRequest) (models.Cart, int, error) {
 	// check if tree exists
 	var tree models.Tree
 	r.DB.Where("id = ?", cart.TreeID).First(&tree)
 	if tree.ID == 0 {
-		return http.StatusNotFound, errors.New("Tree not found")
+		return models.Cart{}, http.StatusNotFound, errors.New("Tree not found")
 	}
 
 	// check if tree stock enough
 	if tree.Stock < cart.Quantity {
-		return http.StatusBadRequest, errors.New("Not enough stock")
+		return models.Cart{}, http.StatusBadRequest, errors.New("Tree stock not enough")
 	}
 
 	// check if cart already exists
@@ -72,10 +72,10 @@ func (r *cartRepository) AddCart(cart models.AddCartRequest) (int, error) {
 		existingCart.Quantity += cart.Quantity
 		err := r.DB.Save(&existingCart).Error
 		if err != nil {
-			return http.StatusInternalServerError, err
+			return models.Cart{}, http.StatusInternalServerError, err
 		}
 
-		return http.StatusOK, nil
+		return models.Cart{}, http.StatusOK, nil
 	}
 
 	newCart := models.Cart{
@@ -85,17 +85,17 @@ func (r *cartRepository) AddCart(cart models.AddCartRequest) (int, error) {
 	}
 	err := r.DB.Create(&newCart).Error
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return models.Cart{}, http.StatusInternalServerError, err
 	}
 
 	// update tree stock
 	tree.Stock -= cart.Quantity
 	err = r.DB.Save(&tree).Error
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return models.Cart{}, http.StatusInternalServerError, err
 	}
 
-	return http.StatusOK, nil
+	return newCart, http.StatusOK, nil
 }
 
 func (r *cartRepository) DeleteCart(cartID int) (int, error) {

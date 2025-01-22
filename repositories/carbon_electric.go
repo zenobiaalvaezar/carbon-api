@@ -27,8 +27,9 @@ func NewCarbonElectricRepository(DB *gorm.DB) CarbonElectricRepository {
 func (repo *carbonElectricRepository) GetAllCarbonElectrics(userId int) ([]models.CarbonElectricResponse, int, error) {
 	var carbonElectrics []models.CarbonElectricResponse
 	result := repo.DB.Table("carbon_electrics").
-		Select("carbon_electrics.id, carbon_electrics.user_id, users.name as user_name, users.email as user_email, carbon_electrics.usage_type, carbon_electrics.usage_amount, carbon_electrics.total_consumption, carbon_electrics.emission_factor, carbon_electrics.emission_amount").
+		Select("carbon_electrics.id, carbon_electrics.user_id, users.name as user_name, users.email as user_email, electrics.id as electric_id, electrics.province, electrics.price, 'kWh' unit, carbon_electrics.usage_type, carbon_electrics.usage_amount, carbon_electrics.total_consumption, carbon_electrics.emission_factor, carbon_electrics.emission_amount").
 		Joins("JOIN users ON carbon_electrics.user_id = users.id").
+		Joins("JOIN electrics ON carbon_electrics.electric_id = electrics.id").
 		Where("carbon_electrics.user_id = ?", userId).
 		Order("carbon_electrics.id").
 		Scan(&carbonElectrics)
@@ -46,8 +47,9 @@ func (repo *carbonElectricRepository) GetAllCarbonElectrics(userId int) ([]model
 func (repo *carbonElectricRepository) GetCarbonElectricByID(id int) (models.CarbonElectricResponse, int, error) {
 	var carbonElectric models.CarbonElectricResponse
 	result := repo.DB.Table("carbon_electrics").
-		Select("carbon_electrics.id, carbon_electrics.user_id, users.name as user_name, users.email as user_email, carbon_electrics.usage_type, carbon_electrics.usage_amount, carbon_electrics.total_consumption, carbon_electrics.emission_factor, carbon_electrics.emission_amount").
+		Select("carbon_electrics.id, carbon_electrics.user_id, users.name as user_name, users.email as user_email, electrics.id as electric_id, electrics.province, electrics.price, 'kWh' unit, carbon_electrics.usage_type, carbon_electrics.usage_amount, carbon_electrics.total_consumption, carbon_electrics.emission_factor, carbon_electrics.emission_amount").
 		Joins("JOIN users ON carbon_electrics.user_id = users.id").
+		Joins("JOIN electrics ON carbon_electrics.electric_id = electrics.id").
 		Where("carbon_electrics.id = ?", id).
 		Scan(&carbonElectric)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) || carbonElectric.ID == 0 {
@@ -58,6 +60,7 @@ func (repo *carbonElectricRepository) GetCarbonElectricByID(id int) (models.Carb
 }
 
 func (repo *carbonElectricRepository) CreateCarbonElectric(carbonElectric models.CarbonElectricRequest) (models.CarbonElectric, int, error) {
+	// Get electric data
 	var electric models.Electric
 	res := repo.DB.First(&electric, carbonElectric.ElectricID)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {

@@ -59,12 +59,12 @@ func (cc *CartController) AddCart(c echo.Context) error {
 	userId := c.Get("user_id").(int)
 	cart.UserID = userId
 
-	statusCode, err := cc.CartRepository.AddCart(cart)
+	newCart, statusCode, err := cc.CartRepository.AddCart(cart)
 	if err != nil {
 		return c.JSON(statusCode, map[string]string{"message": err.Error()})
 	}
 
-	return c.JSON(statusCode, map[string]string{"message": "Success add tree to cart"})
+	return c.JSON(statusCode, newCart)
 }
 
 // DeleteCart godoc

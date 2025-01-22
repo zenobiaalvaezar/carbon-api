@@ -17,6 +17,10 @@ type CarbonElectricResponse struct {
 	UserID           int     `json:"user_id"`
 	UserName         string  `json:"user_name"`
 	UserEmail        string  `json:"user_email"`
+	ElectricID       int     `json:"electric_id"`
+	Province         string  `json:"province"`
+	Price            float64 `json:"price"`
+	Unit             string  `json:"unit"`
 	UsageType        string  `json:"usage_type"`
 	UsageAmount      float64 `json:"usage_amount"`
 	TotalConsumption float64 `json:"total_consumption"`
