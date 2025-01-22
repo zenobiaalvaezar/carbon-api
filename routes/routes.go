@@ -79,6 +79,7 @@ func Init(e *echo.Echo) {
 	electricController := controllers.NewElectricController(electricRepository, electricCache)
 
 	l := e.Group("/electrics")
+	l.Use(middlewares.CheckAuth)
 	l.GET("", electricController.GetAllElectrics)
 	l.GET("/:id", electricController.GetElectricByID)
 	l.POST("", electricController.CreateElectric)
@@ -89,6 +90,7 @@ func Init(e *echo.Echo) {
 	carbonElectricController := controllers.NewCarbonElectricController(carbonElectricRepo)
 
 	ce := e.Group("/carbon-electrics")
+	ce.Use(middlewares.CheckAuth)
 	ce.GET("", carbonElectricController.GetAllCarbonElectrics)
 	ce.GET("/:id", carbonElectricController.GetCarbonElectricByID)
 	ce.POST("", carbonElectricController.CreateCarbonElectric)
