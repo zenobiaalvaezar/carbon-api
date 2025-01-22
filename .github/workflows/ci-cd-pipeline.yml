@@ -86,22 +86,21 @@ jobs:
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
-            --timeout 10m
-              --set-secrets \
-                "API_PORT=projects/persuasive-axe-317613/secrets/API_PORT/versions/latest" \
-                "PORT=projects/persuasive-axe-317613/secrets/PORT/versions/latest" \
-                "BASE_URL=projects/persuasive-axe-317613/secrets/BASE_URL/versions/latest" \
-                "DATABASE_URL=projects/persuasive-axe-317613/secrets/DATABASE_URL/versions/latest" \
-                "REDIS_URL=projects/persuasive-axe-317613/secrets/REDIS_URL/versions/latest" \
-                "MONGODB_URI=projects/persuasive-axe-317613/secrets/MONGODB_URI/versions/latest" \
-                "MONGO_DATABASE=projects/persuasive-axe-317613/secrets/MONGO_DATABASE/versions/latest" \
-                "MONGO_COLLECTION=projects/persuasive-axe-317613/secrets/MONGO_COLLECTION/versions/latest" \
-                "SMTP_HOST=projects/persuasive-axe-317613/secrets/SMTP_HOST/versions/latest" \
-                "SMTP_PORT=projects/persuasive-axe-317613/secrets/SMTP_PORT/versions/latest" \
-                "SMTP_USERNAME=projects/persuasive-axe-317613/secrets/SMTP_USERNAME/versions/latest" \
-                "SMTP_PASSWORD=projects/persuasive-axe-317613/secrets/SMTP_PASSWORD/versions/latest" \
-                "JWT_SECRET=projects/persuasive-axe-317613/secrets/JWT_SECRET/versions/latest" \
-                "XENDIT_API_URL=projects/persuasive-axe-317613/secrets/XENDIT_API_URL/versions/latest" \
-                "XENDIT_SECRET_KEY=projects/persuasive-axe-317613/secrets/XENDIT_SECRET_KEY/versions/latest" \
-                "GEMINI_API_KEY=projects/persuasive-axe-317613/secrets/GEMINI_API_KEY/versions/latest" \
-                "OPENAI_API_KEY=projects/persuasive-axe-317613/secrets/OPENAI_API_KEY/versions/latest"
+            --timeout 10m \
+            --set-secrets API_PORT=API_PORT:latest \
+            --set-secrets PORT=PORT:latest \
+            --set-secrets BASE_URL=BASE_URL:latest \
+            --set-secrets DATABASE_URL=DATABASE_URL:latest \
+            --set-secrets REDIS_URL=REDIS_URL:latest \
+            --set-secrets MONGODB_URI=MONGODB_URI:latest \
+            --set-secrets MONGO_DATABASE=MONGO_DATABASE:latest \
+            --set-secrets MONGO_COLLECTION=MONGO_COLLECTION:latest \
+            --set-secrets SMTP_HOST=SMTP_HOST:latest \
+            --set-secrets SMTP_PORT=SMTP_PORT:latest \
+            --set-secrets SMTP_USERNAME=SMTP_USERNAME:latest \
+            --set-secrets SMTP_PASSWORD=SMTP_PASSWORD:latest \
+            --set-secrets JWT_SECRET=JWT_SECRET:latest \
+            --set-secrets XENDIT_API_URL=XENDIT_API_URL:latest \
+            --set-secrets XENDIT_SECRET_KEY=XENDIT_SECRET_KEY:latest \
+            --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest \
+            --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
