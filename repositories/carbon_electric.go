@@ -58,9 +58,15 @@ func (repo *carbonElectricRepository) GetCarbonElectricByID(id int) (models.Carb
 }
 
 func (repo *carbonElectricRepository) CreateCarbonElectric(carbonElectric models.CarbonElectricRequest) (models.CarbonElectric, int, error) {
+	var electric models.Electric
+	res := repo.DB.First(&electric, carbonElectric.ElectricID)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return models.CarbonElectric{}, http.StatusNotFound, errors.New("Electric not found")
+	}
+
 	// Calculate total consumption and emission amount
-	totalConsumption := utils.CalculateTotalConsumption(carbonElectric.UsageType, carbonElectric.UsageAmount, carbonElectric.Price)
-	emissionAmount := utils.CalculateEmissionAmount(totalConsumption, carbonElectric.EmissionFactor)
+	totalConsumption := utils.CalculateTotalConsumption(carbonElectric.UsageType, carbonElectric.UsageAmount, electric.Price)
+	emissionAmount := utils.CalculateEmissionAmount(totalConsumption, electric.EmissionFactor)
 
 	newCarbonElectric := models.CarbonElectric{
 		UserID:           carbonElectric.UserID,
@@ -68,9 +74,9 @@ func (repo *carbonElectricRepository) CreateCarbonElectric(carbonElectric models
 		UsageType:        carbonElectric.UsageType,
 		UsageAmount:      carbonElectric.UsageAmount,
 		TotalConsumption: totalConsumption,
-		EmissionFactor:   carbonElectric.EmissionFactor,
+		EmissionFactor:   electric.EmissionFactor,
 		EmissionAmount:   emissionAmount,
-		Price:            carbonElectric.Price,
+		Price:            electric.Price,
 	}
 
 	result := repo.DB.Create(&newCarbonElectric)

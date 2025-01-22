@@ -3035,8 +3035,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "electric_id",
-                "emission_factor",
-                "price",
                 "usage_amount",
                 "usage_type",
                 "user_id"
@@ -3044,12 +3042,6 @@ const docTemplate = `{
             "properties": {
                 "electric_id": {
                     "type": "integer"
-                },
-                "emission_factor": {
-                    "type": "number"
-                },
-                "price": {
-                    "type": "number"
                 },
                 "usage_amount": {
                     "type": "number"

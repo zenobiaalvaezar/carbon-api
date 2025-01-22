@@ -31,10 +31,6 @@ definitions:
     properties:
       electric_id:
         type: integer
-      emission_factor:
-        type: number
-      price:
-        type: number
       usage_amount:
         type: number
       usage_type:
@@ -46,8 +42,6 @@ definitions:
         type: integer
     required:
     - electric_id
-    - emission_factor
-    - price
     - usage_amount
     - usage_type
     - user_id
