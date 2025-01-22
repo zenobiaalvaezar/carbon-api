@@ -88,7 +88,6 @@ jobs:
             --allow-unauthenticated \
             --timeout 10m \
             --set-secrets API_PORT=API_PORT:latest \
-            --set-secrets PORT=PORT:latest \
             --set-secrets BASE_URL=BASE_URL:latest \
             --set-secrets DATABASE_URL=DATABASE_URL:latest \
             --set-secrets REDIS_URL=REDIS_URL:latest \
