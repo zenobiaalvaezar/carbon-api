@@ -15,6 +15,16 @@ func NewTransactionController(TransactionRepository repositories.TransactionRepo
 	return &TransactionController{TransactionRepository}
 }
 
+// GetAllTransactions godoc
+// @Summary Get all transactions for a user
+// @Description Retrieve a list of all transactions for the authenticated user
+// @Tags Transactions
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Transaction
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
 func (controller *TransactionController) GetAllTransactions(c echo.Context) error {
 	userId := c.Get("user_id").(int)
 	transactions, statusCode, err := controller.TransactionRepository.GetAllTransactions(userId)
@@ -24,6 +34,18 @@ func (controller *TransactionController) GetAllTransactions(c echo.Context) erro
 	return c.JSON(http.StatusOK, transactions)
 }
 
+// AddTransaction godoc
+// @Summary Add a new transaction
+// @Description Create a new transaction for the authenticated user
+// @Tags Transactions
+// @Accept json
+// @Produce json
+// @Param transaction body models.Transaction true "Transaction data"
+// @Success 200 {object} models.Transaction
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /transactions [post]
 func (controller *TransactionController) AddTransaction(c echo.Context) error {
 	userId := c.Get("user_id").(int)
 	transaction, statusCode, err := controller.TransactionRepository.AddTransaction(userId)

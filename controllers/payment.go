@@ -17,6 +17,18 @@ func NewPaymentController(paymentRepository repositories.PaymentRepository) *Pay
 	return &PaymentController{paymentRepository}
 }
 
+// CreatePayment godoc
+// @Summary Create a new payment
+// @Description Create a new payment request for a user, specifying the transaction ID, payment method, and other details
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param paymentRequest body models.PaymentRequest true "Payment Request"
+// @Success 200 {object} models.PaymentResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /payments [post]
 func (ctrl *PaymentController) CreatePayment(c echo.Context) error {
 	var payment models.PaymentRequest
 	c.Bind(&payment)
@@ -32,6 +44,20 @@ func (ctrl *PaymentController) CreatePayment(c echo.Context) error {
 	return c.JSON(status, paymentResponse)
 }
 
+// VerifyPayment godoc
+// @Summary Verify a payment transaction
+// @Description Verify the status of a payment transaction by its transaction ID and status (either success or failed)
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param id path int true "Transaction ID"
+// @Param status query string true "Payment Status" Enums(success, failed)
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /payments/verify/{id} [get]
 func (ctrl *PaymentController) VerifyPayment(c echo.Context) error {
 	transactionID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

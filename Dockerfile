@@ -1,5 +1,10 @@
 FROM golang:1.22 AS builder
 
+# Install wkhtmltopdf
+RUN apt-get update && apt-get install -y \
+    wkhtmltopdf \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /app
 
