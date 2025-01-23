@@ -61,7 +61,7 @@ func (ctrl *EmailVerificationController) HandleEmailVerification(c echo.Context)
 		message = "Your email has been successfully verified! 🎉"
 	}
 
-	ctrl.PdfGeneratorService.PdfHandler()
+	ctrl.PdfGeneratorService.PdfHandler(user.ID)
 
 	return c.Render(http.StatusOK, "verify-email.html", map[string]interface{}{
 		"Message":      message,

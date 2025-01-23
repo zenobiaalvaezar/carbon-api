@@ -185,7 +185,7 @@ func Init(e *echo.Echo) {
 	renderer := controllers.NewTemplateRenderer("views")
 	e.Renderer = renderer
 
-	pdfGeneratorService := services.NewGeneratePdfService()
+	pdfGeneratorService := services.NewGeneratePdfService(userRepository, electricRepository, fuelRepository)
 	emailVerifyController := controllers.NewEmailVerificationController(userRepository, pdfGeneratorService)
 	e.Debug = true
 	e.GET("/verify-email", emailVerifyController.HandleEmailVerification)

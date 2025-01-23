@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"carbon-api/repositories"
 	"carbon-api/utils"
 	"context"
 	"encoding/json"
@@ -18,14 +19,18 @@ import (
 )
 
 type IGeneratePdfService interface {
-	PdfHandler() error
-	PdfHandlerSummary() error
+	PdfHandler(userID int) error
+	PdfHandlerSummary(userID int) error
 }
 
-type GeneratePdfService struct{}
+type GeneratePdfService struct {
+	UserRepository     repositories.UserRepository
+	ElectricRepository repositories.ElectricRepository
+	FuelRepository     repositories.FuelRepository
+}
 
-func NewGeneratePdfService() IGeneratePdfService {
-	return &GeneratePdfService{}
+func NewGeneratePdfService(userRepository repositories.UserRepository, electricRepository repositories.ElectricRepository, fuelRepository repositories.FuelRepository) IGeneratePdfService {
+	return &GeneratePdfService{UserRepository: userRepository, ElectricRepository: electricRepository, FuelRepository: fuelRepository}
 }
 
 type ReportData struct {
@@ -43,15 +48,15 @@ type Fuel struct {
 	EmissionFactor float64
 	Price          float64
 	Unit           string
-	Value          float64 // This will represent the value for the bar height
-	X              float64 // X position for the bar
-	Y              float64 // Y position for the bar
+	Value          float64
+	X              float64
+	Y              float64
 	TextX, TextY   float64
 }
 
 type EmissionData struct {
-	NationalAvg int
-	ProvinceAvg int
+	NationalAvg float64
+	ProvinceAvg float64
 }
 
 type ReportDataSummary struct {
@@ -130,7 +135,22 @@ func generateContent() string {
 	return recommendations
 }
 
-func (ctrl *GeneratePdfService) PdfHandler() error {
+func (ctrl *GeneratePdfService) PdfHandler(userID int) error {
+	user, _, err := ctrl.UserRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	nationalAvg, provinceAvg, err := ctrl.ElectricRepository.GetAverageEmission(user.ProvinceID)
+	if err != nil {
+		return err
+	}
+
+	fuels, _, err := ctrl.FuelRepository.GetTop4FuelsByEmissionFactor()
+	if err != nil {
+		return err
+	}
+
 	go func() {
 		tmplPath := filepath.Join("templates", "carbon_emission_per_province_pdf.html")
 		tmpl, err := template.ParseFiles(tmplPath)
@@ -138,14 +158,17 @@ func (ctrl *GeneratePdfService) PdfHandler() error {
 			log.Printf("Error loading template: %v", err)
 		}
 
-		fuelData := []Fuel{
-			{ID: 1, Category: "Bahan Bakar Cair", Name: "Pertamax Plus/Turbo", EmissionFactor: 2.368, Price: 13250, Unit: "Liter", Value: 150},
-			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
-			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
+		var fuelData []Fuel
+		for _, fuel := range fuels {
+			fuelData = append(fuelData, Fuel{
+				ID:             fuel.ID,
+				Category:       fuel.Category,
+				Name:           fuel.Name,
+				EmissionFactor: fuel.EmissionFactor,
+				Price:          fuel.Price,
+				Unit:           fuel.Unit,
+				Value:          fuel.EmissionFactor,
+			})
 		}
 
 		for i, fuel := range fuelData {
@@ -156,15 +179,19 @@ func (ctrl *GeneratePdfService) PdfHandler() error {
 			fuelData[i] = fuel
 		}
 
+		const maxValue = 50.0
+		nationalAvg = scaleValueToMax(nationalAvg, maxValue)
+		provinceAvg = scaleValueToMax(provinceAvg, maxValue)
+
 		var renderedHTML bytes.Buffer
 		data := ReportData{
-			Address:    "123 Greenway Blvd, Ontario",
+			Address:    user.Address,
 			ReportDate: time.Now().Format("January 2, 2006"),
 			Emission:   "CO₂ Emission",
 			FuelData:   fuelData,
 			EmissionData: EmissionData{
-				NationalAvg: 50,
-				ProvinceAvg: 40,
+				NationalAvg: nationalAvg,
+				ProvinceAvg: provinceAvg,
 			},
 		}
 
@@ -195,7 +222,16 @@ func (ctrl *GeneratePdfService) PdfHandler() error {
 	return nil
 }
 
-func (ctrl *GeneratePdfService) PdfHandlerSummary() error {
+func scaleValueToMax(value, maxValue float64) float64 {
+	if value > maxValue {
+		// If the value exceeds the maximum, scale it to the max
+		return maxValue
+	}
+	// Otherwise, return the original value
+	return value
+}
+
+func (ctrl *GeneratePdfService) PdfHandlerSummary(userID int) error {
 	tmplPath := filepath.Join("templates", "summary.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {

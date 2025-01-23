@@ -14,6 +14,7 @@ type FuelRepository interface {
 	CreateFuel(fuel models.FuelRequest) (models.Fuel, int, error)
 	UpdateFuel(id int, fuel models.FuelRequest) (models.Fuel, int, error)
 	DeleteFuel(id int) (int, error)
+	GetTop4FuelsByEmissionFactor() ([]models.Fuel, int, error)
 }
 
 type fuelRepository struct {
@@ -93,4 +94,14 @@ func (repo *fuelRepository) DeleteFuel(id int) (int, error) {
 	}
 
 	return http.StatusOK, nil
+}
+
+func (repo *fuelRepository) GetTop4FuelsByEmissionFactor() ([]models.Fuel, int, error) {
+	var fuels []models.Fuel
+	result := repo.DB.Order("emission_factor desc").Limit(4).Find(&fuels)
+	if result.Error != nil {
+		return nil, http.StatusInternalServerError, result.Error
+	}
+
+	return fuels, http.StatusOK, nil
 }
