@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"carbon-api/repositories"
+	"carbon-api/services"
 	"carbon-api/utils"
 	"fmt"
 	"net/http"
@@ -10,11 +11,12 @@ import (
 )
 
 type EmailVerificationController struct {
-	UserRepository repositories.UserRepository
+	UserRepository      repositories.UserRepository
+	PdfGeneratorService services.IGeneratePdfService
 }
 
-func NewEmailVerificationController(userRepository repositories.UserRepository) *EmailVerificationController {
-	return &EmailVerificationController{userRepository}
+func NewEmailVerificationController(userRepository repositories.UserRepository, pdfGeneratorService services.IGeneratePdfService) *EmailVerificationController {
+	return &EmailVerificationController{UserRepository: userRepository, PdfGeneratorService: pdfGeneratorService}
 }
 
 func (ctrl *EmailVerificationController) HandleEmailVerification(c echo.Context) error {
@@ -58,6 +60,8 @@ func (ctrl *EmailVerificationController) HandleEmailVerification(c echo.Context)
 		messageClass = "success"
 		message = "Your email has been successfully verified! 🎉"
 	}
+
+	ctrl.PdfGeneratorService.PdfHandler()
 
 	return c.Render(http.StatusOK, "verify-email.html", map[string]interface{}{
 		"Message":      message,
