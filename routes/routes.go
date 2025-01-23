@@ -181,5 +181,11 @@ func Init(e *echo.Echo) {
 	e.POST("/ai", newGeminiAPIController.GeminiAPI)
 	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
 
+	renderer := controllers.NewTemplateRenderer("views")
+	e.Renderer = renderer
+	emailVerifyController := controllers.NewEmailVerificationController(userRepository)
+	e.Debug = true
+	e.GET("/verify-email", emailVerifyController.HandleEmailVerification)
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

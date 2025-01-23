@@ -19,7 +19,6 @@
     }
 
     .container {
-      max-width: 800px;
       margin: 0 auto;
       background: #fff;
     }
@@ -34,18 +33,16 @@
     .header .total-emission {
       background-color: #f5f5f5;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 4px;
     }
 
     .header .total-emission h1 {
       font-size: 2.5rem;
       margin-bottom: 10px;
-      color: #444;
     }
 
     .header .total-emission p {
       font-size: 1rem;
-      color: #666;
     }
 
     .trees-needed .count {
@@ -56,7 +53,6 @@
 
     .trees-needed p {
       font-size: 0.9rem;
-      color: #666;
       margin-top: 5px;
     }
 
@@ -67,7 +63,6 @@
     .last-record h3 {
       font-size: 1.25rem;
       margin-bottom: 15px;
-      color: #444;
     }
 
     table {
@@ -97,11 +92,13 @@
 
 <body>
   <div class="container">
-    <h2 style="margin-bottom: 18px; padding: 20px;">Emission Record Overview</h2>
+    <h2 style="margin-bottom: 18px;">Emission Record Overview</h2>
     <div class="header">
       <div class="total-emission" style="flex: 1; margin-right: 14px;">
-        <h1>{{.TotalEmission}}</h1>
-        <p>Total Emission</p>
+        <div style="margin-bottom: 8px;">
+          <p>total Emission</p>
+          <h1>{{.TotalEmission}}</h1>
+        </div>
         <p>{{.UserName}}<br>{{.UserEmail}}</p>
       </div>
       <div class="trees-needed">
@@ -141,8 +138,8 @@
           </svg>
           <div class="count">{{.TreesNeeded}}</div>
         </div>
-        <p>To offset this carbon emission, you would need {{.TreesNeeded}} trees.<br>Calculated Total Trees: (total
-          emission ÷ 345)</p>
+        <p>To offset this carbon emission, you would need <b>{{.TreesNeeded}}</b> trees.</p>
+         <p style="color: 717171; font-size: 10px;"><b>Calculated Total Trees:</b> {calculated_trees} trees (Based on the formula: Total Emission ÷ 34.5)</p>
       </div>
     </div>
     <div class="last-record">
@@ -152,7 +149,8 @@
           <tr>
             <th>Fuel Emission</th>
             <th>Electric Emission</th>
-            <th>Total</th>
+            <th>Total Emission</th>
+            <th>Total Tree</th>
           </tr>
         </thead>
         <tbody>
@@ -161,6 +159,7 @@
             <td>{{.FuelEmission}}</td>
             <td>{{.ElectricEmission}}</td>
             <td>{{.TotalEmission}}</td>
+            <td>{{.TotalTree}}</td>
           </tr>
           {{end}}
         </tbody>
@@ -169,7 +168,7 @@
     <div class="last-record">
       <h3>AI Prediction</h3>
       <pre
-        style="display: block; white-space: pre-wrap; word-wrap: break-word; background-color: #f4f4f4; padding: 20px; border-radius: 8px; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: #333;">
+        style="display: block; white-space: pre-wrap; word-wrap: break-word; background-color: #f4f4f4; padding: 20px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: #333;">
         {{.AIPredictions}}
       </pre>
     </div>

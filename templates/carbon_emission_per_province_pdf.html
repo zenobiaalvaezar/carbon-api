@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Emission Report</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 0 auto; 
+            background: #fff;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-svg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+        }
+
+        .bar-chart-svg {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 400x;
+            margin-top: 20px;
+        }
+
+        .bar-chart-svg rect {
+            fill: #e74c3c;
+        }
+
+        .bar-chart-svg text {
+            text-anchor: middle;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="section" style="text-align: left;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Electricity Emission Overview</h2>
+            <p style="font-size: 14px; color: #717171;">Emission factors show how much CO₂ is produced from energy sources like electricity and fuel. Here's a
+                comparison of the emission factors in your area and nationally:</p>
+            <div style="display: flex; margin-top: 18px; font-size: 14px">
+                <div style="background-color: #F4F4F4; padding: 8px 12px; border-radius: 4px; width: 100%; display: flex; align-items: flex-end;">
+                    <div style="width: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <p class="address">{{.Address}}</p>
+                        <p class="report-date">Report Date: {{.ReportDate}}</p>
+                    </div>
+                </div>
+
+                <div style="margin-left: 24px; display: flex; flex: 1;">
+                    <p style="margin-bottom: 4px; font-size: 14px;">Electric</p>
+                    <div style="font-size: 14px">
+                        <svg class="chart-svg" height="121" style="display: block; margin: 24px auto;">
+                            <circle cx="50" cy="50" r="{{.EmissionData.NationalAvg}}" fill="#ccc" stroke="#ccc" stroke-width="2"></circle>
+                            <text x="50" y="50" text-anchor="middle" fill="#333" font-size="12" dy=".35em">
+                                {{.EmissionData.NationalAvg}}
+                            </text>
+                            
+                            <circle cx="150" cy="50" r="{{.EmissionData.ProvinceAvg}}" fill="#e74c3c" stroke="#e74c3c" stroke-width="2"></circle>
+                            <text x="150" y="50" text-anchor="middle" fill="#fff" font-size="12" dy=".35em">
+                                {{.EmissionData.ProvinceAvg}}
+                            </text>
+                        </svg>
+                    </div>
+                    <div style="margin-top: 24px; align-self: flex-end;">
+                        <div class="legend">
+                            <div class="legend-item" style="margin-bottom: 8px;">
+                                <div class="legend-color" style="background-color: #e74c3c;"></div>
+                                <span>Province Average</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #ccc;"></div>
+                                <span>National Average</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 24px;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Fuel Usage</h2>
+            <p style="font-size: 14px; color: #717171;">Highlighting key fuel types in your ecosystem and their carbon emissions:</p>
+
+            <h3 style="margin-top: 18px; font-size: 16px; font-weight: 400; margin-bottom: 12px;">Top Fuel Types by Emission Factor:</h3>
+            <div style="background-color: #f4f4f4; padding: 20px; border-radius: 4px;">
+                <table role="presentation" width="100%" style="border-collapse: collapse; text-align: center;">
+                    <tr>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <svg class="bar-chart-svg" width="900" height="250">
+                                {{range .FuelData}}
+                                <rect x="{{.X}}" y="{{.Y}}" width="70" height="{{.Value}}" fill="#4caf50" rx="10" ry="10" />
+                                <text x="{{.TextX}}" y="{{.TextY}}" text-anchor="middle" font-size="12" fill="#fff" dy="4">{{.Value}}</text>
+                                <text x="{{.TextX}}" y="220" text-anchor="middle" font-size="10" fill="#333">{{.Name}}</text>
+                                {{end}}
+                            </svg>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Electricity vs Fuel</h2>
+            <p style="font-size: 14px; color: #717171;">In your province, using (e.g., LPG or Gasoline) for energy needs may result in <strong>higher</strong>
+                emissions compared to electricity based on the emission factors.</p>
+        </div>
+    </div>
+</body>
+
+</html>

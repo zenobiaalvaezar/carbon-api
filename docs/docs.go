@@ -2241,6 +2241,53 @@ const docTemplate = `{
             }
         },
         "/transactions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all transactions for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Get all transactions for a user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -3061,6 +3108,9 @@ const docTemplate = `{
         "models.CarbonElectricResponse": {
             "type": "object",
             "properties": {
+                "electric_id": {
+                    "type": "integer"
+                },
                 "emission_amount": {
                     "type": "number"
                 },
@@ -3070,8 +3120,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "price": {
+                    "type": "number"
+                },
+                "province": {
+                    "type": "string"
+                },
                 "total_consumption": {
                     "type": "number"
+                },
+                "unit": {
+                    "type": "string"
                 },
                 "usage_amount": {
                     "type": "number"
@@ -3327,6 +3386,9 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
+                },
+                "province_id": {
+                    "type": "integer"
                 }
             }
         },

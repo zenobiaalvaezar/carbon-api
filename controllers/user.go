@@ -37,6 +37,8 @@ func NewUserController(userRepository repositories.UserRepository) *UserControll
 // @Failure 500 {object} map[string]string
 // @Router /register [post]
 func (ctrl *UserController) RegisterUser(c echo.Context) error {
+	baseURL := os.Getenv("BASE_URL")
+
 	var request models.RegisterRequest
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
@@ -73,11 +75,12 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 	}
 	// Kirim email notifikasi
 	subject := "Welcome to Carbon App!"
+	token, _ := utils.GenerateToken(user.Email)
 	data := map[string]string{
-		"Name": response.Name,
+		"ConfirmationLink": fmt.Sprintf("%s/verify-email?token=%s", baseURL, token),
 	}
 
-	emailBody, err := utils.RenderTemplate(data, "templates/regist_success.html")
+	emailBody, err := utils.RenderTemplate(data, "templates/email_confirmation.html")
 	if err != nil {
 		log.Fatalf("Error rendering template: %v", err)
 	}
@@ -112,6 +115,10 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 	user, status, err := ctrl.UserRepository.GetUserByEmail(request.Email)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
+	}
+
+	if !user.IsEmailVerified {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Please verified email first"})
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {

@@ -64,6 +64,7 @@ type EmissionRecord struct {
 	FuelEmission     int
 	ElectricEmission int
 	TotalEmission    int
+	TotalTree        int
 }
 
 func generateContent() string {
@@ -169,8 +170,8 @@ func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
 			Emission:   "CO₂ Emission",
 			FuelData:   fuelData,
 			EmissionData: EmissionData{
-				NationalAvg: 100,
-				ProvinceAvg: 80,
+				NationalAvg: 50,
+				ProvinceAvg: 40,
 			},
 		}
 
@@ -218,8 +219,8 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		UserEmail:     "fr081938@gmail.com",
 		TreesNeeded:   155,
 		LastRecords: []EmissionRecord{
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109},
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109},
+			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
+			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
 		},
 	}
 

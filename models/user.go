@@ -3,14 +3,16 @@ package models
 import "time"
 
 type User struct {
-	ID        int       `gorm:"primaryKey" json:"id"`
-	RoleID    int       `json:"role_id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Phone     string    `json:"phone"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"created_at"`
+	ID              int       `gorm:"primaryKey" json:"id"`
+	RoleID          int       `json:"role_id"`
+	Name            string    `json:"name"`
+	Email           string    `json:"email"`
+	Password        string    `json:"password"`
+	Phone           string    `json:"phone"`
+	Address         string    `json:"address"`
+	IsEmailVerified bool      `json:"is_email_verified"`
+	ProvinceID      int       `json:"province_id"`
+	CreatedAt       time.Time `json:"created_at"`
 }
 
 type UserProfileResponse struct {
@@ -24,12 +26,13 @@ type UserProfileResponse struct {
 }
 
 type RegisterRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Phone    string `json:"phone"`
-	Address  string `json:"address"`
-	RoleID   int    `json:"-"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	Phone      string `json:"phone"`
+	Address    string `json:"address"`
+	RoleID     int    `json:"-"`
+	ProvinceID int    `json:"province_id"`
 }
 
 type RegisterResponse struct {

@@ -48,14 +48,22 @@ definitions:
     type: object
   models.CarbonElectricResponse:
     properties:
+      electric_id:
+        type: integer
       emission_amount:
         type: number
       emission_factor:
         type: number
       id:
         type: integer
+      price:
+        type: number
+      province:
+        type: string
       total_consumption:
         type: number
+      unit:
+        type: string
       usage_amount:
         type: number
       usage_type:
@@ -222,6 +230,8 @@ definitions:
         type: string
       phone:
         type: string
+      province_id:
+        type: integer
     type: object
   models.RegisterResponse:
     properties:
@@ -1799,6 +1809,36 @@ paths:
       tags:
       - Roles
   /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all transactions for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all transactions for a user
+      tags:
+      - Transactions
     post:
       consumes:
       - application/json
