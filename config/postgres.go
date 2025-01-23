@@ -7,7 +7,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -18,10 +17,14 @@ func ConnectPostgres() {
 	// dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=require&PreferSimpleProtocol=true&statement_cache_mode=describe", dbuser, dbpass, dbhost, dbport, dbname)
 
 	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger:      logger.Default.LogMode(logger.Info),
-		PrepareStmt: false,
-	})
+	// DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	// 	Logger:      logger.Default.LogMode(logger.Info),
+	// 	PrepareStmt: false,
+	// })
+	DB, err = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)
