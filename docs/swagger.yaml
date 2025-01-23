@@ -13,11 +13,6 @@ definitions:
     - prompt
     - size
     type: object
-  controllers.RequestPayload:
-    properties:
-      prompt:
-        type: string
-    type: object
   models.AddCartRequest:
     properties:
       quantity:
@@ -372,43 +367,6 @@ info:
   title: Carbon API
   version: "1.0"
 paths:
-  /ai:
-    post:
-      consumes:
-      - application/json
-      description: Generate content related to carbon emission prediction and recommendations
-        using Gemini AI
-      parameters:
-      - description: Request payload containing the prompt
-        in: body
-        name: requestBody
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.RequestPayload'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Generate content based on the provided prompt
-      tags:
-      - GeminiAPI
   /ai/generate-image:
     post:
       consumes:
@@ -1235,29 +1193,6 @@ paths:
       summary: Update an existing fuel
       tags:
       - Fuels
-  /generate-pdf:
-    post:
-      consumes:
-      - application/json
-      description: Generate a PDF report based on emission data and send it via email
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: PDF generated and sent to fr081938@gmail.com
-          schema:
-            type: string
-        "500":
-          description: Error generating PDF or sending email
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Generate a PDF report for carbon emissions
-      tags:
-      - Reports
   /generate-pdf-summary:
     post:
       consumes:

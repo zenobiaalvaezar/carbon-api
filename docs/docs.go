@@ -20,61 +20,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/ai": {
-            "post": {
-                "description": "Generate content related to carbon emission prediction and recommendations using Gemini AI",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "GeminiAPI"
-                ],
-                "summary": "Generate content based on the provided prompt",
-                "parameters": [
-                    {
-                        "description": "Request payload containing the prompt",
-                        "name": "requestBody",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.RequestPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/ai/generate-image": {
             "post": {
                 "description": "Generate an image based on the given prompt and send it via email",
@@ -1342,43 +1287,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/generate-pdf": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Generate a PDF report based on emission data and send it via email",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Reports"
-                ],
-                "summary": "Generate a PDF report for carbon emissions",
-                "responses": {
-                    "200": {
-                        "description": "PDF generated and sent to fr081938@gmail.com",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Error generating PDF or sending email",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -3053,14 +2961,6 @@ const docTemplate = `{
                         "512x512",
                         "1024x1024"
                     ]
-                }
-            }
-        },
-        "controllers.RequestPayload": {
-            "type": "object",
-            "properties": {
-                "prompt": {
-                    "type": "string"
                 }
             }
         },

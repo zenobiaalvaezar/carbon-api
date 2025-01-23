@@ -88,7 +88,7 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to send email"})
 	}
 
-	return c.JSON(status, response)
+	return c.JSON(status, map[string]string{"message": "Verification email has been sent"})
 }
 
 // LoginUser godoc

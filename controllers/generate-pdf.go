@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/google/generative-ai-go/genai"
@@ -236,11 +237,14 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 	}
 
 	subject := "Your Generated PDF Report"
-	dataBofy := map[string]string{
-		"Name": "Fathur Rohman Wahidd",
+	dataBody := map[string]string{
+		"Name":          user.Name,
+		"TotalEmission": strconv.FormatFloat(carbonSummary.TotalEmission, 'f', -1, 64),
+		"Email":         user.Email,
+		"TotalTrees":    string(carbonSummary.TotalTree),
 	}
 
-	emailBody, err := utils.RenderTemplate(dataBofy, "templates/weekly_email_emission_record.html")
+	emailBody, err := utils.RenderTemplate(dataBody, "templates/weekly_email_emission_record.html")
 	if err != nil {
 		log.Fatalf("Error rendering template: %v", err)
 	}
@@ -250,5 +254,5 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to send email")
 	}
 
-	return c.String(http.StatusOK, "PDF generated and sent to fr081938@gmail.com")
+	return c.String(http.StatusOK, "PDF generated and sent to "+user.Email)
 }
