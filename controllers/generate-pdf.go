@@ -91,7 +91,7 @@ func generateContent(totalEmission float64, treesNeeded int, lastRecords []Emiss
 	// Constructing the dynamic prompt
 	var lastRecordsStr string
 	for i, record := range lastRecords {
-		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %.2f, Emisi Listrik = %.2f, Total Emisi = %.2f\n",
+		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %df, Emisi Listrik = %df, Total Emisi = %d\n",
 			i+1, record.FuelEmission, record.ElectricEmission, record.TotalEmission)
 	}
 
