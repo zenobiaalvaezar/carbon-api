@@ -4,23 +4,14 @@ import (
 	"bytes"
 	"carbon-api/repositories"
 	"carbon-api/utils"
-	"context"
-	"encoding/json"
 	"log"
-	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 	"text/template"
 	"time"
-
-	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/option"
 )
 
 type IGeneratePdfService interface {
 	PdfHandler(userID int) error
-	PdfHandlerSummary(userID int) error
 }
 
 type GeneratePdfService struct {
@@ -73,66 +64,6 @@ type EmissionRecord struct {
 	ElectricEmission int
 	TotalEmission    int
 	TotalTree        int
-}
-
-func generateContent() string {
-	ctx := context.Background()
-
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-
-	model := client.GenerativeModel("gemini-1.5-flash")
-
-	resp, err := model.GenerateContent(ctx, genai.Text(`
-		Analisis data emisi karbon berikut dan berikan prediksi untuk emisi di masa depan serta rekomendasi untuk mencapai netralitas karbon. Prediksi harus didasarkan pada catatan sebelumnya dan mencakup langkah-langkah yang dapat dilakukan.
-		Data:
-
-		Total Emisi: 38.901
-		Jumlah Pohon yang Dibutuhkan: 155
-		Catatan Terakhir:
-		Rekor 1: Emisi Bahan Bakar = 1.905, Emisi Listrik = 203, Total Emisi = 109
-		Rekor 2: Emisi Bahan Bakar = 1.905, Emisi Listrik = 203, Total Emisi = 109
-	
-		Format Output on single string:
-
-		Prediksi emisi untuk 6 bulan ke depan.
-		Garis waktu untuk mencapai netralitas karbon jika tren saat ini berlanjut.
-		Rekomendasi untuk mengurangi emisi.
-	`,
-	))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var recommendations string
-	reHTML := regexp.MustCompile(`(?i)<!DOCTYPE html>|<(html|head|body)[^>]*>|</(html|head|body)>|<title>.*</title>`)
-	reBackticks := regexp.MustCompile("```")
-
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				if txt, ok := part.(genai.Text); ok {
-					var validJSON interface{}
-					if err := json.Unmarshal([]byte(txt), &validJSON); err == nil {
-						var recipes []string
-						if err := json.Unmarshal([]byte(txt), &recipes); err != nil {
-							log.Fatal(err)
-						}
-						recommendations += strings.Join(recipes, "\n") + "\n"
-					} else {
-						plainText := reHTML.ReplaceAllString(string(txt), "")   // Remove the <html>, <head>, <body> tags
-						plainText = reBackticks.ReplaceAllString(plainText, "") // Remove backticks
-						recommendations += plainText + "\n"
-					}
-				}
-			}
-		}
-	}
-
-	return recommendations
 }
 
 func (ctrl *GeneratePdfService) PdfHandler(userID int) error {
@@ -214,7 +145,7 @@ func (ctrl *GeneratePdfService) PdfHandler(userID int) error {
 			log.Fatalf("Error rendering template: %v", err)
 		}
 
-		if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, emailBody, pdfData); err != nil {
+		if err := utils.SendEmailWithPdfAttachment(user.Email, subject, emailBody, pdfData); err != nil {
 			log.Printf("Error sending email: %v", err)
 		}
 	}()
@@ -229,44 +160,4 @@ func scaleValueToMax(value, maxValue float64) float64 {
 	}
 	// Otherwise, return the original value
 	return value
-}
-
-func (ctrl *GeneratePdfService) PdfHandlerSummary(userID int) error {
-	tmplPath := filepath.Join("templates", "summary.html")
-	tmpl, err := template.ParseFiles(tmplPath)
-	if err != nil {
-		log.Printf("Error loading template: %v", err)
-	}
-
-	var renderedHTML bytes.Buffer
-	data := ReportDataSummary{
-		TotalEmission: 38901,
-		UserName:      "Fathur Rohman",
-		UserEmail:     "fr081938@gmail.com",
-		TreesNeeded:   155,
-		LastRecords: []EmissionRecord{
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
-		},
-	}
-
-	aiPredictions := generateContent()
-	data.AIPredictions = aiPredictions
-
-	if err := tmpl.Execute(&renderedHTML, data); err != nil {
-		log.Printf("Error rendering template: %v", err)
-	}
-
-	pdfData, err := utils.HtmlToPDF(renderedHTML.String())
-	if err != nil {
-		log.Printf("Error generating PDF: %v", err)
-	}
-
-	subject := "Your Generated PDF Report"
-	body := "Please find your PDF report attached."
-	if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, body, pdfData); err != nil {
-		log.Printf("Error sending email: %v", err)
-	}
-
-	return nil
 }

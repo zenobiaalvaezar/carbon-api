@@ -2,9 +2,13 @@ package controllers
 
 import (
 	"bytes"
+	"carbon-api/models"
+	"carbon-api/repositories"
 	"carbon-api/utils"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -12,17 +16,21 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/google/generative-ai-go/genai"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/api/option"
+	"gorm.io/gorm"
 )
 
-type GeneratePdfController struct{}
+type GeneratePdfController struct {
+	UserRepository           repositories.UserRepository
+	CarbonElectricRepository repositories.CarbonElectricRepository
+	CarbonSummaryRepository  repositories.CarbonSummaryRepository
+}
 
-func NewGeneratePdfController() *GeneratePdfController {
-	return &GeneratePdfController{}
+func NewGeneratePdfController(userRepository repositories.UserRepository, carbonElectricRepository repositories.CarbonElectricRepository, carbonSummaryRepository repositories.CarbonSummaryRepository) *GeneratePdfController {
+	return &GeneratePdfController{UserRepository: userRepository, CarbonElectricRepository: carbonElectricRepository, CarbonSummaryRepository: carbonSummaryRepository}
 }
 
 type ReportData struct {
@@ -40,9 +48,9 @@ type Fuel struct {
 	EmissionFactor float64
 	Price          float64
 	Unit           string
-	Value          float64 // This will represent the value for the bar height
-	X              float64 // X position for the bar
-	Y              float64 // Y position for the bar
+	Value          float64
+	X              float64
+	Y              float64
 	TextX, TextY   float64
 }
 
@@ -67,9 +75,10 @@ type EmissionRecord struct {
 	TotalTree        int
 }
 
-func generateContent() string {
+func generateContent(totalEmission float64, treesNeeded int, lastRecords []EmissionRecord) string {
 	ctx := context.Background()
 
+	// Set up Gemini client
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
 	if err != nil {
 		log.Fatal(err)
@@ -78,23 +87,30 @@ func generateContent() string {
 
 	model := client.GenerativeModel("gemini-1.5-flash")
 
-	resp, err := model.GenerateContent(ctx, genai.Text(`
+	// Constructing the dynamic prompt
+	var lastRecordsStr string
+	for i, record := range lastRecords {
+		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %.2f, Emisi Listrik = %.2f, Total Emisi = %.2f\n",
+			i+1, record.FuelEmission, record.ElectricEmission, record.TotalEmission)
+	}
+
+	prompt := fmt.Sprintf(`
 		Analisis data emisi karbon berikut dan berikan prediksi untuk emisi di masa depan serta rekomendasi untuk mencapai netralitas karbon. Prediksi harus didasarkan pada catatan sebelumnya dan mencakup langkah-langkah yang dapat dilakukan.
 		Data:
-
-		Total Emisi: 38.901
-		Jumlah Pohon yang Dibutuhkan: 155
+		
+		Total Emisi: %.2f
+		Jumlah Pohon yang Dibutuhkan: %d
 		Catatan Terakhir:
-		Rekor 1: Emisi Bahan Bakar = 1.905, Emisi Listrik = 203, Total Emisi = 109
-		Rekor 2: Emisi Bahan Bakar = 1.905, Emisi Listrik = 203, Total Emisi = 109
-	
-		Format Output on single string:
-
+		%s
+		
+		Format Output:
 		Prediksi emisi untuk 6 bulan ke depan.
 		Garis waktu untuk mencapai netralitas karbon jika tren saat ini berlanjut.
 		Rekomendasi untuk mengurangi emisi.
-	`,
-	))
+	`, totalEmission, treesNeeded, lastRecordsStr)
+
+	// Request content generation from the model
+	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,11 +119,13 @@ func generateContent() string {
 	reHTML := regexp.MustCompile(`(?i)<!DOCTYPE html>|<(html|head|body)[^>]*>|</(html|head|body)>|<title>.*</title>`)
 	reBackticks := regexp.MustCompile("```")
 
+	// Process the response
 	for _, cand := range resp.Candidates {
 		if cand.Content != nil {
 			for _, part := range cand.Content.Parts {
 				if txt, ok := part.(genai.Text); ok {
 					var validJSON interface{}
+					// If it's valid JSON, try to unmarshal and return as list of recommendations
 					if err := json.Unmarshal([]byte(txt), &validJSON); err == nil {
 						var recipes []string
 						if err := json.Unmarshal([]byte(txt), &recipes); err != nil {
@@ -115,8 +133,9 @@ func generateContent() string {
 						}
 						recommendations += strings.Join(recipes, "\n") + "\n"
 					} else {
-						plainText := reHTML.ReplaceAllString(string(txt), "")   // Remove the <html>, <head>, <body> tags
-						plainText = reBackticks.ReplaceAllString(plainText, "") // Remove backticks
+						// Clean HTML tags and backticks if not valid JSON
+						plainText := reHTML.ReplaceAllString(string(txt), "")
+						plainText = reBackticks.ReplaceAllString(plainText, "")
 						recommendations += plainText + "\n"
 					}
 				}
@@ -125,73 +144,6 @@ func generateContent() string {
 	}
 
 	return recommendations
-}
-
-// PdfHandler godoc
-// @Summary Generate a PDF report for carbon emissions
-// @Description Generate a PDF report based on emission data and send it via email
-// @Tags Reports
-// @Accept json
-// @Produce json
-// @Success 200 {string} string "PDF generated and sent to fr081938@gmail.com"
-// @Failure 500 {object} map[string]string "Error generating PDF or sending email"
-// @Security BearerAuth
-// @Router /generate-pdf [post]
-func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
-	go func() {
-		tmplPath := filepath.Join("templates", "report.html")
-		tmpl, err := template.ParseFiles(tmplPath)
-		if err != nil {
-			log.Printf("Error loading template: %v", err)
-		}
-
-		fuelData := []Fuel{
-			{ID: 1, Category: "Bahan Bakar Cair", Name: "Pertamax Plus/Turbo", EmissionFactor: 2.368, Price: 13250, Unit: "Liter", Value: 150},
-			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
-			{ID: 2, Category: "Bahan Bakar Cair", Name: "Pertamax", EmissionFactor: 2.363, Price: 12500, Unit: "Liter", Value: 100},
-			{ID: 3, Category: "Bahan Bakar Cair", Name: "Pertalite", EmissionFactor: 2.367, Price: 12000, Unit: "Liter", Value: 80},
-			{ID: 4, Category: "Bahan Bakar Cair", Name: "Premium", EmissionFactor: 2.373, Price: 6500, Unit: "Liter", Value: 130},
-		}
-
-		for i, fuel := range fuelData {
-			fuel.X = float64(i*90 + 40)
-			fuel.Y = 200 - fuel.Value
-			fuel.TextX = fuel.X + 35
-			fuel.TextY = fuel.Y + (fuel.Value / 2)
-			fuelData[i] = fuel
-		}
-
-		var renderedHTML bytes.Buffer
-		data := ReportData{
-			Address:    "123 Greenway Blvd, Ontario",
-			ReportDate: time.Now().Format("January 2, 2006"),
-			Emission:   "CO₂ Emission",
-			FuelData:   fuelData,
-			EmissionData: EmissionData{
-				NationalAvg: 50,
-				ProvinceAvg: 40,
-			},
-		}
-
-		if err := tmpl.Execute(&renderedHTML, data); err != nil {
-			log.Printf("Error rendering template: %v", err)
-		}
-
-		pdfData, err := utils.HtmlToPDF(renderedHTML.String())
-		if err != nil {
-			log.Printf("Error generating PDF: %v", err)
-		}
-
-		subject := "Your Generated PDF Report"
-		body := "Please find your PDF report attached."
-		if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, body, pdfData); err != nil {
-			log.Printf("Error sending email: %v", err)
-		}
-	}()
-
-	return c.String(http.StatusOK, "PDF generated and sent to fr081938@gmail.com")
 }
 
 // PdfHandlerSummary godoc
@@ -205,26 +157,71 @@ func (ctrl *GeneratePdfController) PdfHandler(c echo.Context) error {
 // @Security BearerAuth
 // @Router /generate-pdf-summary [post]
 func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
-	tmplPath := filepath.Join("templates", "summary.html")
+	userID, ok := c.Get("user_id").(int)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"message": "User ID is invalid or missing. Please log in to continue.",
+		})
+	}
+
+	user, _, err := ctrl.UserRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	lastRecords, _, err := ctrl.CarbonElectricRepository.GetLast3CarbonElectrics(userID)
+	if err != nil {
+		return err
+	}
+
+	// Attempt to get the carbon summary
+	carbonSummary, _, err := ctrl.CarbonSummaryRepository.GetCarbonSummary(userID)
+
+	// Check if the error is due to "Carbon summary not found"
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) || err.Error() == "Carbon summary not found" {
+			// Log the error but continue with a fallback or default data
+			log.Printf("Warning: Carbon summary not found for user %d. Using default values.", userID)
+			// You can initialize carbonSummary with default values here if needed
+			carbonSummary = models.CarbonSummaryResponse{
+				TotalEmission: 0,
+				TotalTree:     0,
+			}
+		} else {
+			// If it's another error, return it
+			return err
+		}
+	}
+
+	tmplPath := filepath.Join("templates", "weekly_email_emission_record_pdf.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		log.Printf("Error loading template: %v", err)
 		return c.String(http.StatusInternalServerError, "Failed to load template")
 	}
 
-	var renderedHTML bytes.Buffer
-	data := ReportDataSummary{
-		TotalEmission: 38901,
-		UserName:      "Fathur Rohman",
-		UserEmail:     "fr081938@gmail.com",
-		TreesNeeded:   155,
-		LastRecords: []EmissionRecord{
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
-			{FuelEmission: 1905, ElectricEmission: 203, TotalEmission: 109, TotalTree: 120},
-		},
+	var emissionRecords []EmissionRecord
+	for _, record := range lastRecords {
+		totalTree := utils.CalculateTotalTree(record.TotalConsumption)
+
+		emissionRecords = append(emissionRecords, EmissionRecord{
+			FuelEmission:     int(record.UsageAmount),
+			ElectricEmission: int(record.TotalConsumption),
+			TotalEmission:    int(record.TotalConsumption),
+			TotalTree:        totalTree,
+		})
 	}
 
-	aiPredictions := generateContent()
+	var renderedHTML bytes.Buffer
+	data := ReportDataSummary{
+		TotalEmission: int(carbonSummary.TotalEmission),
+		UserName:      user.Name,
+		UserEmail:     user.Email,
+		TreesNeeded:   carbonSummary.TotalTree,
+		LastRecords:   emissionRecords,
+	}
+
+	aiPredictions := generateContent(carbonSummary.TotalEmission, carbonSummary.TotalTree, emissionRecords)
 	data.AIPredictions = aiPredictions
 
 	if err := tmpl.Execute(&renderedHTML, data); err != nil {
@@ -239,8 +236,16 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 	}
 
 	subject := "Your Generated PDF Report"
-	body := "Please find your PDF report attached."
-	if err := utils.SendEmailWithPdfAttachment("fr081938@gmail.com", subject, body, pdfData); err != nil {
+	dataBofy := map[string]string{
+		"Name": "Fathur Rohman Wahidd",
+	}
+
+	emailBody, err := utils.RenderTemplate(dataBofy, "templates/weekly_email_emission_record.html")
+	if err != nil {
+		log.Fatalf("Error rendering template: %v", err)
+	}
+
+	if err := utils.SendEmailWithPdfAttachment(user.Email, subject, emailBody, pdfData); err != nil {
 		log.Printf("Error sending email: %v", err)
 		return c.String(http.StatusInternalServerError, "Failed to send email")
 	}
