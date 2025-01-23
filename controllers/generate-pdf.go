@@ -241,7 +241,7 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		"Name":          user.Name,
 		"TotalEmission": strconv.FormatFloat(carbonSummary.TotalEmission, 'f', -1, 64),
 		"Email":         user.Email,
-		"TotalTrees":    string(carbonSummary.TotalTree),
+		"TotalTrees":    strconv.Itoa(carbonSummary.TotalTree),
 	}
 
 	emailBody, err := utils.RenderTemplate(dataBody, "templates/weekly_email_emission_record.html")
