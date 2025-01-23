@@ -6,7 +6,6 @@ import (
 	"carbon-api/controllers"
 	"carbon-api/middlewares"
 	"carbon-api/repositories"
-	"carbon-api/services"
 
 	_ "carbon-api/docs"
 
@@ -179,14 +178,6 @@ func Init(e *echo.Echo) {
 	// Gemini API routes
 	newGeminiAPIController := controllers.NewGeminiAPIController()
 	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
-
-	renderer := controllers.NewTemplateRenderer("views")
-	e.Renderer = renderer
-
-	pdfGeneratorService := services.NewGeneratePdfService(userRepository, electricRepository, fuelRepository)
-	emailVerifyController := controllers.NewEmailVerificationController(userRepository, pdfGeneratorService)
-	e.Debug = true
-	e.GET("/verify-email", emailVerifyController.HandleEmailVerification)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

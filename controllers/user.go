@@ -22,7 +22,7 @@ type UserController struct {
 }
 
 func NewUserController(userRepository repositories.UserRepository) *UserController {
-	return &UserController{userRepository}
+	return &UserController{UserRepository: userRepository}
 }
 
 // RegisterUser godoc
@@ -37,8 +37,6 @@ func NewUserController(userRepository repositories.UserRepository) *UserControll
 // @Failure 500 {object} map[string]string
 // @Router /register [post]
 func (ctrl *UserController) RegisterUser(c echo.Context) error {
-	baseURL := os.Getenv("BASE_URL")
-
 	var request models.RegisterRequest
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
@@ -73,22 +71,22 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 		Address:   user.Address,
 		CreatedAt: user.CreatedAt,
 	}
-	// Kirim email notifikasi
-	subject := "Welcome to Carbon App!"
-	token, _ := utils.GenerateToken(user.Email)
-	data := map[string]string{
-		"ConfirmationLink": fmt.Sprintf("%s/verify-email?token=%s", baseURL, token),
+
+	subject := "Your Generated PDF Report"
+	dataBofy := map[string]string{
+		"Name": user.Name,
 	}
 
-	emailBody, err := utils.RenderTemplate(data, "templates/email_confirmation.html")
+	emailBody, err := utils.RenderTemplate(dataBofy, "templates/regist_success.html")
 	if err != nil {
 		log.Fatalf("Error rendering template: %v", err)
 	}
-	if err := utils.SendEmail(response.Email, subject, emailBody); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to send email"})
+
+	if err := utils.SendEmail(user.Email, subject, emailBody); err != nil {
+		log.Printf("Error sending email: %v", err)
 	}
 
-	return c.JSON(status, map[string]string{"message": "Verification email has been sent"})
+	return c.JSON(status, response)
 }
 
 // LoginUser godoc
@@ -115,10 +113,6 @@ func (ctrl *UserController) LoginUser(c echo.Context) error {
 	user, status, err := ctrl.UserRepository.GetUserByEmail(request.Email)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
-	}
-
-	if !user.IsEmailVerified {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Please verified email first"})
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {

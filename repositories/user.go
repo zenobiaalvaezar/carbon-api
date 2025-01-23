@@ -17,7 +17,6 @@ type UserRepository interface {
 	GetUserByID(id int) (models.User, int, error)
 	UpdatePassword(user models.User) error
 	GetRoleNameByID(roleID int) (string, error)
-	UpdateEmailVerificationStatus(userID int, isVerified bool) (models.User, error)
 }
 
 type userRepository struct {
@@ -31,14 +30,12 @@ func NewUserRepository(DB *gorm.DB) UserRepository {
 func (repo *userRepository) CreateUser(userRequest models.RegisterRequest) (models.User, int, error) {
 
 	newUser := models.User{
-		Name:            userRequest.Name,
-		Email:           userRequest.Email,
-		Password:        userRequest.Password, // Password should already be hashed
-		Phone:           userRequest.Phone,
-		Address:         userRequest.Address,
-		RoleID:          userRequest.RoleID,
-		ProvinceID:      userRequest.ProvinceID,
-		IsEmailVerified: false,
+		Name:     userRequest.Name,
+		Email:    userRequest.Email,
+		Password: userRequest.Password,
+		Phone:    userRequest.Phone,
+		Address:  userRequest.Address,
+		RoleID:   userRequest.RoleID,
 	}
 	fmt.Printf("User data before insert: %+v\n", newUser)
 
@@ -114,24 +111,4 @@ func (repo *userRepository) GetRoleNameByID(roleID int) (string, error) {
 		return "", result.Error
 	}
 	return role.Name, nil
-}
-
-func (repo *userRepository) UpdateEmailVerificationStatus(userID int, isVerified bool) (models.User, error) {
-	var user models.User
-	result := repo.DB.First(&user, userID)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return user, errors.New("User not found")
-		}
-		return user, result.Error
-	}
-
-	user.IsEmailVerified = isVerified
-
-	result = repo.DB.Save(&user)
-	if result.Error != nil {
-		return user, result.Error
-	}
-
-	return user, nil
 }

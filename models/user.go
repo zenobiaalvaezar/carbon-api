@@ -10,8 +10,6 @@ type User struct {
 	Password        string    `json:"password"`
 	Phone           string    `json:"phone"`
 	Address         string    `json:"address"`
-	IsEmailVerified bool      `json:"is_email_verified"`
-	ProvinceID      int       `json:"province_id"`
 	CreatedAt       time.Time `json:"created_at"`
 }
 
@@ -32,7 +30,6 @@ type RegisterRequest struct {
 	Phone      string `json:"phone"`
 	Address    string `json:"address"`
 	RoleID     int    `json:"-"`
-	ProvinceID int    `json:"province_id"`
 }
 
 type RegisterResponse struct {
