@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"bytes"
 	"carbon-api/models"
 	"carbon-api/repositories"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -133,5 +135,57 @@ func TestGetCarbonElectricByID_Failure_InvalidID(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	expectedBody := `{"message":"Invalid carbon electric ID"}`
+	assert.JSONEq(t, expectedBody, rec.Body.String())
+}
+
+func TestCreateCarbonElectric_Success(t *testing.T) {
+	e := echo.New()
+	mockRepository := new(repositories.MockCarbonElectricRepository)
+
+	requestPayload := models.CarbonElectricRequest{
+		UserID: 2, ElectricID: 1, UsageType: "consumption", UsageAmount: 100.0,
+	}
+	createdCarbonElectric := models.CarbonElectric{
+		ID: 1, UserID: 2, ElectricID: 1, UsageType: "consumption", UsageAmount: 100.0,
+	}
+	mockRepository.On("CreateCarbonElectric", requestPayload).Return(createdCarbonElectric, http.StatusCreated, nil)
+
+	controller := NewCarbonElectricController(mockRepository)
+
+	requestBody, _ := json.Marshal(requestPayload)
+	req := httptest.NewRequest(http.MethodPost, "/carbon-electrics", bytes.NewReader(requestBody))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	ctx := e.NewContext(req, rec)
+	ctx.Set("user_id", 2)
+
+	err := controller.CreateCarbonElectric(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, rec.Code)
+
+	expectedBody, _ := json.Marshal(createdCarbonElectric)
+	assert.JSONEq(t, string(expectedBody), rec.Body.String())
+}
+
+func TestDeleteCarbonElectric_Success(t *testing.T) {
+	e := echo.New()
+	mockRepository := new(repositories.MockCarbonElectricRepository)
+
+	mockRepository.On("DeleteCarbonElectric", 1, 2).Return(http.StatusOK, nil)
+
+	controller := NewCarbonElectricController(mockRepository)
+
+	req := httptest.NewRequest(http.MethodDelete, "/carbon-electrics/1", nil)
+	rec := httptest.NewRecorder()
+	ctx := e.NewContext(req, rec)
+	ctx.SetParamNames("id")
+	ctx.SetParamValues("1")
+	ctx.Set("user_id", 2)
+
+	err := controller.DeleteCarbonElectric(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	expectedBody := `{"message":"Success delete carbon electric"}`
 	assert.JSONEq(t, expectedBody, rec.Body.String())
 }

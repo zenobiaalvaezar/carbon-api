@@ -32,7 +32,7 @@ func (repo *userRepository) CreateUser(userRequest models.RegisterRequest) (mode
 	newUser := models.User{
 		Name:     userRequest.Name,
 		Email:    userRequest.Email,
-		Password: userRequest.Password, // Password should already be hashed
+		Password: userRequest.Password,
 		Phone:    userRequest.Phone,
 		Address:  userRequest.Address,
 		RoleID:   userRequest.RoleID,

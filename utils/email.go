@@ -52,7 +52,9 @@ func SendEmailWithAttachment(to, subject, body string, imageData []byte) error {
 		bodyBuffer.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
 	}
 	bodyBuffer.WriteString("\r\n--" + boundary + "\r\n")
-	bodyBuffer.WriteString("Content-Type: text/plain; charset=utf-8\r\n\r\n")
+
+	// Set content type to HTML for the body
+	bodyBuffer.WriteString("Content-Type: text/html; charset=utf-8\r\n\r\n")
 	bodyBuffer.WriteString(body + "\r\n")
 	bodyBuffer.WriteString("\r\n--" + boundary + "\r\n")
 
@@ -93,7 +95,9 @@ func SendEmailWithPdfAttachment(to, subject, body string, pdfData []byte) error 
 		bodyBuffer.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
 	}
 	bodyBuffer.WriteString("\r\n--" + boundary + "\r\n")
-	bodyBuffer.WriteString("Content-Type: text/plain; charset=utf-8\r\n\r\n")
+
+	// Set content type to HTML for the body
+	bodyBuffer.WriteString("Content-Type: text/html; charset=utf-8\r\n\r\n")
 	bodyBuffer.WriteString(body + "\r\n")
 	bodyBuffer.WriteString("\r\n--" + boundary + "\r\n")
 
