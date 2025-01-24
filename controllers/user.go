@@ -22,7 +22,7 @@ type UserController struct {
 }
 
 func NewUserController(userRepository repositories.UserRepository) *UserController {
-	return &UserController{UserRepository: userRepository}
+	return &UserController{userRepository}
 }
 
 // RegisterUser godoc
@@ -82,8 +82,8 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 		log.Fatalf("Error rendering template: %v", err)
 	}
 
-	if err := utils.SendEmail(user.Email, subject, emailBody); err != nil {
-		log.Printf("Error sending email: %v", err)
+	if err := utils.SendEmail(response.Email, subject, emailBody); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to send email"})
 	}
 
 	return c.JSON(status, response)
