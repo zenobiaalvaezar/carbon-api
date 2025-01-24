@@ -20,7 +20,7 @@ func (m *MockCartRepository) AddCart(cart models.AddCartRequest) (models.Cart, i
 	return args.Get(0).(models.Cart), args.Int(1), args.Error(2)
 }
 
-func (m *MockCartRepository) DeleteCart(cartID int) (int, error) {
-	args := m.Called(cartID)
+func (m *MockCartRepository) DeleteCart(cartID int, userID int) (int, error) {
+	args := m.Called(cartID, userID)
 	return args.Int(0), args.Error(1)
 }
