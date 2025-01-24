@@ -72,7 +72,7 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 		CreatedAt: user.CreatedAt,
 	}
 
-	subject := "Your Generated PDF Report"
+	subject := "Welcome to Carbon App!"
 	dataBofy := map[string]string{
 		"Name": user.Name,
 	}
