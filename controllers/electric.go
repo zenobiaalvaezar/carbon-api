@@ -100,6 +100,10 @@ func (ctrl *ElectricController) CreateElectric(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 	}
 
+	if electric.Province == "" || electric.EmissionFactor <= 0 || electric.Price <= 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+	}
+
 	err := ctrl.ElectricRepository.Create(&electric)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -134,6 +138,10 @@ func (ctrl *ElectricController) UpdateElectric(c echo.Context) error {
 
 	var electric models.Electric
 	if err := c.Bind(&electric); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+	}
+
+	if electric.Province == "" || electric.EmissionFactor <= 0 || electric.Price <= 0 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 	}
 

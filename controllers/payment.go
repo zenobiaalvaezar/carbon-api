@@ -33,6 +33,10 @@ func (ctrl *PaymentController) CreatePayment(c echo.Context) error {
 	var payment models.PaymentRequest
 	c.Bind(&payment)
 
+	if payment.TransactionID == 0 || payment.PaymentMethod == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+	}
+
 	userId := c.Get("user_id").(int)
 	payment.UserID = userId
 

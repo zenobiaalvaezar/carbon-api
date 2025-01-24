@@ -28,6 +28,12 @@ func NewUserRepository(DB *gorm.DB) UserRepository {
 }
 
 func (repo *userRepository) CreateUser(userRequest models.RegisterRequest) (models.User, int, error) {
+	// check if email already exists
+	var user models.User
+	result := repo.DB.Where("email = ?", userRequest.Email).First(&user)
+	if result.Error == nil {
+		return models.User{}, http.StatusConflict, errors.New("Email already exists")
+	}
 
 	newUser := models.User{
 		Name:     userRequest.Name,
@@ -39,7 +45,7 @@ func (repo *userRepository) CreateUser(userRequest models.RegisterRequest) (mode
 	}
 	fmt.Printf("User data before insert: %+v\n", newUser)
 
-	result := repo.DB.Create(&newUser)
+	result = repo.DB.Create(&newUser)
 	if result.Error != nil {
 		return models.User{}, http.StatusInternalServerError, result.Error
 	}

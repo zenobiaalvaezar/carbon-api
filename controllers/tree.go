@@ -111,6 +111,10 @@ func (ctrl *TreeController) CreateTree(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 
+	if tree.TreeCategoryID == 0 || tree.Name == "" || tree.Description == "" || tree.Price <= 0 || tree.Stock <= 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+	}
+
 	status, err := ctrl.TreeRepository.CreateTree(&tree)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
@@ -139,6 +143,10 @@ func (ctrl *TreeController) UpdateTree(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	var tree models.Tree
 	if err := c.Bind(&tree); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+	}
+
+	if tree.TreeCategoryID == 0 || tree.Name == "" || tree.Description == "" || tree.Price <= 0 || tree.Stock <= 0 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 

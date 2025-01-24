@@ -50,11 +50,18 @@ func (repo *roleRepository) GetRoleByID(id int) (models.Role, int, error) {
 }
 
 func (repo *roleRepository) CreateRole(roleRequest models.RoleRequest) (models.Role, int, error) {
+	// check if role already exists
+	var role models.Role
+	result := repo.DB.Where("name = ?", roleRequest.Name).First(&role)
+	if result.Error == nil {
+		return models.Role{}, http.StatusConflict, errors.New("Role already exists")
+	}
+
 	newRole := models.Role{
 		Name: roleRequest.Name,
 	}
 
-	result := repo.DB.Create(&newRole)
+	result = repo.DB.Create(&newRole)
 	if result.Error != nil {
 		return models.Role{}, http.StatusInternalServerError, result.Error
 	}
