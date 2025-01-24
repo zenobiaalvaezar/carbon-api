@@ -83,6 +83,10 @@ func (ctrl *CarbonFuelController) CreateCarbonFuel(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 	}
 
+	if carbonFuelRequest.FuelID == 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Fuel ID is required"})
+	}
+
 	if carbonFuelRequest.UsageType != "consumption" && carbonFuelRequest.UsageType != "rupiah" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid usage type"})
 	}

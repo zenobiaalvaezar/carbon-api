@@ -38,7 +38,7 @@ func TestDeleteCart_Success(t *testing.T) {
 	e := echo.New()
 	mockRepository := new(repositories.MockCartRepository)
 
-	mockRepository.On("DeleteCart", 1).Return(http.StatusOK, nil)
+	mockRepository.On("DeleteCart", 1, 1).Return(http.StatusOK, nil)
 
 	controller := NewCartController(mockRepository)
 

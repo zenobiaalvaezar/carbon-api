@@ -79,6 +79,10 @@ func (ctrl *RoleController) CreateRole(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 	}
 
+	if roleRequest.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Role name is required"})
+	}
+
 	role, status, err := ctrl.RoleRepository.CreateRole(roleRequest)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
@@ -109,6 +113,10 @@ func (ctrl *RoleController) UpdateRole(c echo.Context) error {
 	var roleRequest models.RoleRequest
 	if err := c.Bind(&roleRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
+	}
+
+	if roleRequest.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Role name is required"})
 	}
 
 	role, status, err := ctrl.RoleRepository.UpdateRole(id, roleRequest)

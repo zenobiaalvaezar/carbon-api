@@ -168,6 +168,7 @@ func Init(e *echo.Echo) {
 	rp := e.Group("/reports")
 	rp.Use(middlewares.CheckAuth)
 	rp.GET("/summary", reportController.GetReportSummary)
+	rp.GET("/detail", reportController.GetReportDetail)
 
 	// Generate PDF routes
 	pdfGeneratorController := controllers.NewGeneratePdfController(userRepository, carbonElectricRepo, carbonSummaryRepository, carbonFuelRepository)

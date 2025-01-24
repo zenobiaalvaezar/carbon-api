@@ -34,3 +34,23 @@ func (controller *ReportController) GetReportSummary(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, report)
 }
+
+// GetReportDetail godoc
+// @Summary Get the report detail for a user
+// @Description Retrieve a detailed report for the authenticated user, including user details and transaction history
+// @Tags Reports
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.ReportDetail
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security BearerAuth
+// @Router /reports/detail [get]
+func (controller *ReportController) GetReportDetail(c echo.Context) error {
+	userId := c.Get("user_id").(int)
+	report, statusCode, err := controller.ReportRepository.GetReportDetail(userId)
+	if err != nil {
+		return c.JSON(statusCode, err.Error())
+	}
+	return c.JSON(http.StatusOK, report)
+}

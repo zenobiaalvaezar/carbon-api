@@ -25,7 +25,7 @@ func NewCarbonSummaryRepository(DB *gorm.DB) CarbonSummaryRepository {
 func (repo *carbonSummaryRepository) GetCarbonSummary(userId int) (models.CarbonSummaryResponse, int, error) {
 	var carbonSummary models.CarbonSummaryResponse
 	result := repo.DB.Table("carbon_summaries").
-		Select("carbon_summaries.user_id, users.name as user_name, users.email as user_email, carbon_summaries.fuel_emission, carbon_summaries.electric_emission, carbon_summaries.total_emission, carbon_summaries.total_tree").
+		Select("carbon_summaries.user_id, users.name as user_name, users.email as user_email, carbon_summaries.fuel_emission, carbon_summaries.electric_emission, carbon_summaries.total_emission, 'kg CO2e' unit, carbon_summaries.total_tree").
 		Joins("JOIN users ON carbon_summaries.user_id = users.id").
 		Where("carbon_summaries.user_id = ?", userId).
 		Scan(&carbonSummary)

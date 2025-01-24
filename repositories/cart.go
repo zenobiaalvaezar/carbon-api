@@ -11,7 +11,7 @@ import (
 type CartRepository interface {
 	GetAllCart(userID int) ([]models.GetCartsResponse, int, error)
 	AddCart(cart models.AddCartRequest) (models.Cart, int, error)
-	DeleteCart(cartID int) (int, error)
+	DeleteCart(cartID int, userId int) (int, error)
 }
 
 type cartRepository struct {
@@ -98,12 +98,17 @@ func (r *cartRepository) AddCart(cart models.AddCartRequest) (models.Cart, int, 
 	return newCart, http.StatusOK, nil
 }
 
-func (r *cartRepository) DeleteCart(cartID int) (int, error) {
+func (r *cartRepository) DeleteCart(cartID int, userId int) (int, error) {
 	// check if cart exists
 	var existingCart models.Cart
 	r.DB.Where("id = ?", cartID).First(&existingCart)
 	if existingCart.ID == 0 {
 		return http.StatusNotFound, errors.New("Cart not found")
+	}
+
+	// check if user is the owner of the cart
+	if existingCart.UserID != userId {
+		return http.StatusForbidden, errors.New("You are not the owner of the cart")
 	}
 
 	err := r.DB.Delete(&models.Cart{}, cartID).Error
