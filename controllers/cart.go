@@ -56,6 +56,10 @@ func (cc *CartController) AddCart(c echo.Context) error {
 	var cart models.AddCartRequest
 	c.Bind(&cart)
 
+	if cart.TreeID == 0 || cart.Quantity <= 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+	}
+
 	userId := c.Get("user_id").(int)
 	cart.UserID = userId
 
@@ -87,7 +91,8 @@ func (cc *CartController) DeleteCart(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid ID"})
 	}
 
-	statusCode, err := cc.CartRepository.DeleteCart(cartId)
+	userId := c.Get("user_id").(int)
+	statusCode, err := cc.CartRepository.DeleteCart(cartId, userId)
 	if err != nil {
 		return c.JSON(statusCode, map[string]string{"message": err.Error()})
 	}

@@ -40,6 +40,11 @@ func (r *paymentRepository) CreatePayment(payment models.PaymentRequest) (models
 		return models.PaymentResponse{}, http.StatusNotFound, errors.New("User not found")
 	}
 
+	// check if user is same with payment user
+	if user.ID != payment.UserID {
+		return models.PaymentResponse{}, http.StatusForbidden, errors.New("Forbidden")
+	}
+
 	// check payment method is exists in payment method list
 	paymentMethodRepository := NewPaymentMethodRepository(r.MongoCollection)
 	_, _, err := paymentMethodRepository.GetPaymentMethodByCode(payment.PaymentMethod)

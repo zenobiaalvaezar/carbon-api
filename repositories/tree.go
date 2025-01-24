@@ -45,7 +45,14 @@ func (repo *treeRepository) GetTreeByID(id int) (models.Tree, int, error) {
 }
 
 func (repo *treeRepository) CreateTree(tree *models.Tree) (int, error) {
-	result := repo.DB.Create(tree)
+	// check if tree already exists
+	var existingTree models.Tree
+	result := repo.DB.Where("name = ?", tree.Name).First(&existingTree)
+	if result.Error == nil {
+		return http.StatusConflict, errors.New("tree already exists")
+	}
+
+	result = repo.DB.Create(tree)
 	if result.Error != nil {
 		return http.StatusInternalServerError, result.Error
 	}

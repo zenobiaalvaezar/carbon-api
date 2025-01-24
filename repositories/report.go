@@ -10,6 +10,7 @@ import (
 
 type ReportRepository interface {
 	GetReportSummary(userId int) ([]models.ReportSummary, int, error)
+	GetReportDetail(userId int) ([]models.ReportDetail, int, error)
 }
 
 type reportRepository struct {
@@ -55,6 +56,46 @@ func (r *reportRepository) GetReportSummary(userId int) ([]models.ReportSummary,
 			DonationTree: donationTree,
 			BadgeStatus:  badgeStatus,
 		},
+	}
+
+	return response, http.StatusOK, nil
+}
+
+func (r *reportRepository) GetReportDetail(userId int) ([]models.ReportDetail, int, error) {
+	var user models.User
+	r.DB.Where("id = ?", userId).First(&user)
+	if user.ID == 0 {
+		return nil, http.StatusNotFound, errors.New("User not found")
+	}
+
+	var transactions []models.Transaction
+	r.DB.Where("user_id = ?", userId).Find(&transactions)
+	if len(transactions) == 0 {
+		return nil, http.StatusNotFound, errors.New("Transaction not found")
+	}
+
+	var response []models.ReportDetail
+	for _, transaction := range transactions {
+		var details []models.TransactionDetail
+		r.DB.Where("transaction_id = ?", transaction.ID).Find(&details)
+
+		var totalTree int
+		for _, detail := range details {
+			totalTree += detail.Quantity
+		}
+
+		response = append(response, models.ReportDetail{
+			UserID:          userId,
+			UserName:        user.Name,
+			UserEmail:       user.Email,
+			TransactionID:   transaction.ID,
+			TransactionDate: transaction.CreatedAt,
+			TotalTree:       totalTree,
+			TotalPrice:      transaction.TotalPrice,
+			PaymentMethod:   transaction.PaymentMethod,
+			PaymentStatus:   transaction.PaymentStatus,
+			PaymentAt:       transaction.PaymentAt,
+		})
 	}
 
 	return response, http.StatusOK, nil

@@ -88,6 +88,10 @@ func (ctrl *CarbonElectricController) CreateCarbonElectric(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 	}
 
+	if carbonElectricRequest.ElectricID == 0 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Electric ID is required"})
+	}
+
 	if carbonElectricRequest.UsageType != "consumption" && carbonElectricRequest.UsageType != "rupiah" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid usage type"})
 	}

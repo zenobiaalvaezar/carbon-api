@@ -3,6 +3,7 @@ package controllers
 import (
 	"carbon-api/models"
 	"carbon-api/repositories"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -50,6 +51,10 @@ func (ctrl *PaymentMethodController) CreatePaymentMethod(c echo.Context) error {
 	var paymentMethod models.PaymentMethod
 	c.Bind(&paymentMethod)
 
+	if paymentMethod.Code == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Code is required"})
+	}
+
 	paymentMethodResponse, status, err := ctrl.PaymentMethodRepository.CreatePaymentMethod(paymentMethod)
 	if err != nil {
 		return c.JSON(status, map[string]string{"message": err.Error()})
@@ -76,6 +81,10 @@ func (ctrl *PaymentMethodController) UpdatePaymentMethod(c echo.Context) error {
 	id := c.Param("id")
 	var paymentMethod models.PaymentMethod
 	c.Bind(&paymentMethod)
+
+	if paymentMethod.Code == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Code is required"})
+	}
 
 	paymentMethodResponse, status, err := ctrl.PaymentMethodRepository.UpdatePaymentMethod(id, paymentMethod)
 	if err != nil {

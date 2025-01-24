@@ -50,6 +50,13 @@ func (repo *fuelRepository) GetFuelByID(id int) (models.Fuel, int, error) {
 }
 
 func (repo *fuelRepository) CreateFuel(fuel models.FuelRequest) (models.Fuel, int, error) {
+	// check if fuel already exists
+	var existingFuel models.Fuel
+	result := repo.DB.Where("name = ?", fuel.Name).First(&existingFuel)
+	if result.Error == nil {
+		return models.Fuel{}, http.StatusConflict, errors.New("Fuel already exists")
+	}
+
 	newFuel := models.Fuel{
 		Category:       fuel.Category,
 		Name:           fuel.Name,
@@ -58,7 +65,7 @@ func (repo *fuelRepository) CreateFuel(fuel models.FuelRequest) (models.Fuel, in
 		Unit:           fuel.Unit,
 	}
 
-	result := repo.DB.Create(&newFuel)
+	result = repo.DB.Create(&newFuel)
 	if result.Error != nil {
 		return models.Fuel{}, http.StatusInternalServerError, result.Error
 	}

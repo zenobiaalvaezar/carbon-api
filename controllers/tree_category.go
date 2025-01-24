@@ -63,6 +63,11 @@ func CreateTreeCategory(c echo.Context) error {
 	if err := c.Bind(&category); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
 	}
+
+	if category.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Category name is required"})
+	}
+
 	err := repositories.CreateTreeCategory(&category)
 	if err != nil {
 		if err.Error() == "category name already exists" {
@@ -91,6 +96,10 @@ func UpdateTreeCategory(c echo.Context) error {
 	var category models.TreeCategory
 	if err := c.Bind(&category); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
+	}
+
+	if category.Name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Category name is required"})
 	}
 
 	category.ID = id
