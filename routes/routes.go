@@ -170,14 +170,10 @@ func Init(e *echo.Echo) {
 	rp.GET("/summary", reportController.GetReportSummary)
 
 	// Generate PDF routes
-	pdfGeneratorController := controllers.NewGeneratePdfController(userRepository, carbonElectricRepo, carbonSummaryRepository)
+	pdfGeneratorController := controllers.NewGeneratePdfController(userRepository, carbonElectricRepo, carbonSummaryRepository, carbonFuelRepository)
 	ps := e.Group("/generate-pdf-summary")
 	ps.Use(middlewares.CheckAuth)
 	ps.POST("", pdfGeneratorController.PdfHandlerSummary)
-
-	// Gemini API routes
-	newGeminiAPIController := controllers.NewGeminiAPIController()
-	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

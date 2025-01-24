@@ -1,18 +1,4 @@
 definitions:
-  controllers.GenerateImageRequest:
-    properties:
-      prompt:
-        type: string
-      size:
-        enum:
-        - 256x256
-        - 512x512
-        - 1024x1024
-        type: string
-    required:
-    - prompt
-    - size
-    type: object
   models.AddCartRequest:
     properties:
       quantity:
@@ -365,42 +351,6 @@ info:
   title: Carbon API
   version: "1.0"
 paths:
-  /ai/generate-image:
-    post:
-      consumes:
-      - application/json
-      description: Generate an image based on the given prompt and send it via email
-      parameters:
-      - description: Request payload containing the prompt and image size
-        in: body
-        name: requestBody
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.GenerateImageRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Generate an image based on the provided prompt
-      tags:
-      - GeminiAPI
   /carbon-electrics:
     get:
       consumes:

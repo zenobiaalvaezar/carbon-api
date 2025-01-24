@@ -24,11 +24,12 @@ import (
 type GeneratePdfController struct {
 	UserRepository           repositories.UserRepository
 	CarbonElectricRepository repositories.CarbonElectricRepository
+	CarbonFuelRepository     repositories.CarbonFuelRepository
 	CarbonSummaryRepository  repositories.CarbonSummaryRepository
 }
 
-func NewGeneratePdfController(userRepository repositories.UserRepository, carbonElectricRepository repositories.CarbonElectricRepository, carbonSummaryRepository repositories.CarbonSummaryRepository) *GeneratePdfController {
-	return &GeneratePdfController{UserRepository: userRepository, CarbonElectricRepository: carbonElectricRepository, CarbonSummaryRepository: carbonSummaryRepository}
+func NewGeneratePdfController(userRepository repositories.UserRepository, carbonElectricRepository repositories.CarbonElectricRepository, carbonSummaryRepository repositories.CarbonSummaryRepository, carbonFuelRepository repositories.CarbonFuelRepository) *GeneratePdfController {
+	return &GeneratePdfController{UserRepository: userRepository, CarbonElectricRepository: carbonElectricRepository, CarbonSummaryRepository: carbonSummaryRepository, CarbonFuelRepository: carbonFuelRepository}
 }
 
 type ReportData struct {
@@ -58,32 +59,35 @@ type EmissionData struct {
 }
 
 type ReportDataSummary struct {
-	TotalEmission int
-	UserName      string
-	UserEmail     string
-	TreesNeeded   int
-	LastRecords   []EmissionRecord
-	AIPredictions string
+	TotalEmission   int
+	UserName        string
+	UserEmail       string
+	TreesNeeded     int
+	LastRecords     []EmissionRecord
+	LastFuelRecords []EmissionRecord
+	AIPredictions   string
 }
 
 type EmissionRecord struct {
-	FuelEmission     int
-	ElectricEmission int
-	TotalEmission    int
-	TotalTree        int
+	TotalConsumtion int
+	Unit            string
+	TotalEmission   int
+	TotalTree       int
 }
 
-func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastRecords []EmissionRecord) string {
+func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastElectricRecords []EmissionRecord, lastFuelRecords []EmissionRecord) string {
 	ctx := context.Background()
 
-	// Set up OpenAI client
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
-	// Constructing the dynamic prompt
+	var mergedRecords []EmissionRecord
+	mergedRecords = append(mergedRecords, lastElectricRecords...)
+	mergedRecords = append(mergedRecords, lastFuelRecords...)
+
 	var lastRecordsStr string
-	for i, record := range lastRecords {
-		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %d, Emisi Listrik = %d, Total Emisi = %d\n",
-			i+1, record.FuelEmission, record.ElectricEmission, record.TotalEmission)
+	for i, record := range mergedRecords {
+		lastRecordsStr += fmt.Sprintf("Rekor %d: Total Konsumsi = %d, Unit = %s, Total Emisi = %d\n kg CO2e",
+			i+1, record.TotalConsumtion, record.Unit, record.TotalEmission)
 	}
 
 	prompt := fmt.Sprintf(`
@@ -92,7 +96,7 @@ func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastRecor
 		
 		Total Emisi: %.2f
 		Jumlah Pohon yang Dibutuhkan: %d
-		Catatan Terakhir:
+		3 Catatan terakhir Bahan bakar dan Elektric Emission:
 		%s
 		
 		Format Output:
@@ -101,7 +105,6 @@ func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastRecor
 		Rekomendasi untuk mengurangi emisi.
 	`, totalEmission, treesNeeded, lastRecordsStr)
 
-	// Call OpenAI API
 	resp, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: openai.GPT3Dot5Turbo,
 		Messages: []openai.ChatCompletionMessage{
@@ -124,7 +127,6 @@ func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastRecor
 	reHTML := regexp.MustCompile(`(?i)<!DOCTYPE html>|<(html|head|body)[^>]*>|</(html|head|body)>|<title>.*</title>`)
 	reBackticks := regexp.MustCompile("```")
 
-	// Process the response
 	for _, choice := range resp.Choices {
 		plainText := reHTML.ReplaceAllString(choice.Message.Content, "")
 		plainText = reBackticks.ReplaceAllString(plainText, "")
@@ -162,6 +164,11 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		return err
 	}
 
+	lastRecordFuels, _, err := ctrl.CarbonFuelRepository.GetLast3CarbonFuels(userID)
+	if err != nil {
+		return err
+	}
+
 	// Attempt to get the carbon summary
 	carbonSummary, _, err := ctrl.CarbonSummaryRepository.GetCarbonSummary(userID)
 
@@ -190,26 +197,39 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 
 	var emissionRecords []EmissionRecord
 	for _, record := range lastRecords {
-		totalTree := utils.CalculateTotalTree(record.TotalConsumption)
+		totalTree := utils.CalculateTotalTree(record.EmissionAmount)
 
 		emissionRecords = append(emissionRecords, EmissionRecord{
-			FuelEmission:     int(record.UsageAmount),
-			ElectricEmission: int(record.TotalConsumption),
-			TotalEmission:    int(record.TotalConsumption),
-			TotalTree:        totalTree,
+			TotalConsumtion: int(record.TotalConsumption),
+			Unit:            record.Unit,
+			TotalEmission:   int(record.EmissionAmount),
+			TotalTree:       totalTree,
+		})
+	}
+
+	var emissionFueldRecords []EmissionRecord
+	for _, record := range lastRecordFuels {
+		totalTree := utils.CalculateTotalTree(record.EmissionAmount)
+
+		emissionFueldRecords = append(emissionFueldRecords, EmissionRecord{
+			TotalConsumtion: int(record.TotalConsumption),
+			Unit:            record.Unit,
+			TotalEmission:   int(record.EmissionAmount),
+			TotalTree:       totalTree,
 		})
 	}
 
 	var renderedHTML bytes.Buffer
 	data := ReportDataSummary{
-		TotalEmission: int(carbonSummary.TotalEmission),
-		UserName:      user.Name,
-		UserEmail:     user.Email,
-		TreesNeeded:   carbonSummary.TotalTree,
-		LastRecords:   emissionRecords,
+		TotalEmission:   int(carbonSummary.TotalEmission),
+		UserName:        user.Name,
+		UserEmail:       user.Email,
+		TreesNeeded:     carbonSummary.TotalTree,
+		LastRecords:     emissionRecords,
+		LastFuelRecords: emissionFueldRecords,
 	}
 
-	aiPredictions := generateContentWithOpenAI(carbonSummary.TotalEmission, carbonSummary.TotalTree, emissionRecords)
+	aiPredictions := generateContentWithOpenAI(carbonSummary.TotalEmission, carbonSummary.TotalTree, emissionRecords, emissionFueldRecords)
 	data.AIPredictions = aiPredictions
 
 	if err := tmpl.Execute(&renderedHTML, data); err != nil {
@@ -223,7 +243,7 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to generate PDF")
 	}
 
-	subject := "Your Generated PDF Report"
+	subject := "Emission Report"
 	dataBody := map[string]string{
 		"Name":          user.Name,
 		"TotalEmission": strconv.FormatFloat(carbonSummary.TotalEmission, 'f', -1, 64),
