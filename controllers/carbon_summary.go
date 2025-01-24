@@ -23,7 +23,7 @@ func NewCarbonSummaryController(carbonSummaryRepository repositories.CarbonSumma
 // @Success 200 {object} models.CarbonSummaryResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /carbon-summary [get]
+// @Router /carbon-summaries [get]
 func (ctrl *CarbonSummaryController) GetCarbonSummary(c echo.Context) error {
 	userId := c.Get("user_id").(int)
 

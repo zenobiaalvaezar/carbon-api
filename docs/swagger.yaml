@@ -225,8 +225,6 @@ definitions:
         type: string
       phone:
         type: string
-      province_id:
-        type: integer
     type: object
   models.RegisterResponse:
     properties:
@@ -684,7 +682,7 @@ paths:
       summary: Get carbon fuel by ID
       tags:
       - CarbonFuels
-  /carbon-summary:
+  /carbon-summaries:
     get:
       consumes:
       - application/json

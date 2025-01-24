@@ -6,7 +6,6 @@ import (
 	"carbon-api/repositories"
 	"carbon-api/utils"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -16,11 +15,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
-	"strings"
 
-	"github.com/google/generative-ai-go/genai"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/api/option"
+	"github.com/sashabaranov/go-openai"
 	"gorm.io/gorm"
 )
 
@@ -76,22 +73,16 @@ type EmissionRecord struct {
 	TotalTree        int
 }
 
-func generateContent(totalEmission float64, treesNeeded int, lastRecords []EmissionRecord) string {
+func generateContentWithOpenAI(totalEmission float64, treesNeeded int, lastRecords []EmissionRecord) string {
 	ctx := context.Background()
 
-	// Set up Gemini client
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-
-	model := client.GenerativeModel("gemini-1.5-flash")
+	// Set up OpenAI client
+	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
 	// Constructing the dynamic prompt
 	var lastRecordsStr string
 	for i, record := range lastRecords {
-		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %df, Emisi Listrik = %df, Total Emisi = %d\n",
+		lastRecordsStr += fmt.Sprintf("Rekor %d: Emisi Bahan Bakar = %d, Emisi Listrik = %d, Total Emisi = %d\n",
 			i+1, record.FuelEmission, record.ElectricEmission, record.TotalEmission)
 	}
 
@@ -110,38 +101,34 @@ func generateContent(totalEmission float64, treesNeeded int, lastRecords []Emiss
 		Rekomendasi untuk mengurangi emisi.
 	`, totalEmission, treesNeeded, lastRecordsStr)
 
-	// Request content generation from the model
-	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
+	// Call OpenAI API
+	resp, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
+		Model: openai.GPT3Dot5Turbo,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: "You are a helpful assistant that provides environmental analysis and recommendations.",
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: prompt,
+			},
+		},
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var recommendations string
+
 	reHTML := regexp.MustCompile(`(?i)<!DOCTYPE html>|<(html|head|body)[^>]*>|</(html|head|body)>|<title>.*</title>`)
 	reBackticks := regexp.MustCompile("```")
 
 	// Process the response
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				if txt, ok := part.(genai.Text); ok {
-					var validJSON interface{}
-					// If it's valid JSON, try to unmarshal and return as list of recommendations
-					if err := json.Unmarshal([]byte(txt), &validJSON); err == nil {
-						var recipes []string
-						if err := json.Unmarshal([]byte(txt), &recipes); err != nil {
-							log.Fatal(err)
-						}
-						recommendations += strings.Join(recipes, "\n") + "\n"
-					} else {
-						// Clean HTML tags and backticks if not valid JSON
-						plainText := reHTML.ReplaceAllString(string(txt), "")
-						plainText = reBackticks.ReplaceAllString(plainText, "")
-						recommendations += plainText + "\n"
-					}
-				}
-			}
-		}
+	for _, choice := range resp.Choices {
+		plainText := reHTML.ReplaceAllString(choice.Message.Content, "")
+		plainText = reBackticks.ReplaceAllString(plainText, "")
+		recommendations += plainText + "\n"
 	}
 
 	return recommendations
@@ -222,7 +209,7 @@ func (ctrl *GeneratePdfController) PdfHandlerSummary(c echo.Context) error {
 		LastRecords:   emissionRecords,
 	}
 
-	aiPredictions := generateContent(carbonSummary.TotalEmission, carbonSummary.TotalTree, emissionRecords)
+	aiPredictions := generateContentWithOpenAI(carbonSummary.TotalEmission, carbonSummary.TotalTree, emissionRecords)
 	data.AIPredictions = aiPredictions
 
 	if err := tmpl.Execute(&renderedHTML, data); err != nil {

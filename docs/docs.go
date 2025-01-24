@@ -514,7 +514,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/carbon-summary": {
+        "/carbon-summaries": {
             "get": {
                 "description": "Get the carbon summary for a specific user, including fuel and electric emissions, total emissions, and total trees equivalent",
                 "consumes": [
@@ -3286,9 +3286,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "province_id": {
-                    "type": "integer"
                 }
             }
         },
