@@ -71,16 +71,17 @@ func (ctrl *UserController) RegisterUser(c echo.Context) error {
 		Address:   user.Address,
 		CreatedAt: user.CreatedAt,
 	}
-	// Kirim email notifikasi
+
 	subject := "Welcome to Carbon App!"
-	data := map[string]string{
-		"Name": response.Name,
+	dataBofy := map[string]string{
+		"Name": user.Name,
 	}
 
-	emailBody, err := utils.RenderTemplate(data, "templates/regist_success.html")
+	emailBody, err := utils.RenderTemplate(dataBofy, "templates/regist_success.html")
 	if err != nil {
 		log.Fatalf("Error rendering template: %v", err)
 	}
+
 	if err := utils.SendEmail(response.Email, subject, emailBody); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to send email"})
 	}

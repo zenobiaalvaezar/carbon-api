@@ -29,3 +29,8 @@ func (m *MockCarbonFuelRepository) DeleteCarbonFuel(id int, userId int) (int, er
 	args := m.Called(id, userId)
 	return args.Int(0), args.Error(1)
 }
+
+func (m *MockCarbonFuelRepository) GetLast3CarbonFuels(userId int) ([]models.CarbonFuelResponse, int, error) {
+	args := m.Called(userId)
+	return args.Get(0).([]models.CarbonFuelResponse), args.Int(1), args.Error(2)
+}
