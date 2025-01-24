@@ -34,3 +34,8 @@ func (m *FuelRepositoryMock) DeleteFuel(id int) (int, error) {
 	args := m.Called(id)
 	return args.Int(0), args.Error(1)
 }
+
+func (m *FuelRepositoryMock) GetTop4FuelsByEmissionFactor() ([]models.Fuel, int, error) {
+	args := m.Called()
+	return args.Get(0).([]models.Fuel), args.Int(1), args.Error(2)
+}

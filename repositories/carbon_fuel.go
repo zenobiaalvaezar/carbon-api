@@ -14,6 +14,7 @@ type CarbonFuelRepository interface {
 	GetCarbonFuelByID(id int) (models.CarbonFuelResponse, int, error)
 	CreateCarbonFuel(carbonFuel models.CarbonFuelRequest) (models.CarbonFuel, int, error)
 	DeleteCarbonFuel(id int, userId int) (int, error)
+	GetLast3CarbonFuels(userId int) ([]models.CarbonFuelResponse, int, error)
 }
 
 type carbonFuelRepository struct {
@@ -123,4 +124,25 @@ func (repo *carbonFuelRepository) DeleteCarbonFuel(id int, userId int) (int, err
 	}
 
 	return http.StatusOK, nil
+}
+
+func (repo *carbonFuelRepository) GetLast3CarbonFuels(userId int) ([]models.CarbonFuelResponse, int, error) {
+	var carbonFuels []models.CarbonFuelResponse
+	result := repo.DB.Table("carbon_fuels").
+		Select("carbon_fuels.id, carbon_fuels.user_id, users.name as user_name, users.email as user_email, carbon_fuels.fuel_id, fuels.name as fuel_name, carbon_fuels.price, fuels.unit, carbon_fuels.usage_amount, carbon_fuels.usage_type, carbon_fuels.total_consumption, carbon_fuels.emission_factor, carbon_fuels.emission_amount").
+		Joins("JOIN users ON carbon_fuels.user_id = users.id").
+		Joins("JOIN fuels ON carbon_fuels.fuel_id = fuels.id").
+		Where("carbon_fuels.user_id = ?", userId).
+		Order("carbon_fuels.id").
+		Limit(3).
+		Scan(&carbonFuels)
+	if result.Error != nil {
+		return nil, http.StatusInternalServerError, result.Error
+	}
+
+	if len(carbonFuels) == 0 {
+		carbonFuels = []models.CarbonFuelResponse{}
+	}
+
+	return carbonFuels, http.StatusOK, nil
 }

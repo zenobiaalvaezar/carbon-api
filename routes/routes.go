@@ -60,8 +60,8 @@ func Init(e *echo.Echo) {
 	electricController := controllers.NewElectricController(electricRepository, electricCache)
 
 	l := e.Group("/electrics")
-	l.Use(middlewares.CheckAuth)
 	l.GET("", electricController.GetAllElectrics)
+	l.Use(middlewares.CheckAuth)
 	l.GET("/:id", electricController.GetElectricByID)
 	l.POST("", middlewares.CheckRoleAdmin(electricController.CreateElectric))
 	l.PUT("/:id", middlewares.CheckRoleAdmin(electricController.UpdateElectric))
@@ -170,16 +170,10 @@ func Init(e *echo.Echo) {
 	rp.GET("/summary", reportController.GetReportSummary)
 
 	// Generate PDF routes
-	pdfGeneratorController := controllers.NewGeneratePdfController()
-
-	e.POST("/generate-pdf", pdfGeneratorController.PdfHandler)
-	e.POST("/generate-pdf-summary", pdfGeneratorController.PdfHandlerSummary)
-
-	// Gemini API routes
-	newGeminiAPIController := controllers.NewGeminiAPIController()
-
-	e.POST("/ai", newGeminiAPIController.GeminiAPI)
-	e.POST("/ai/generate-image", newGeminiAPIController.GenerateImage)
+	pdfGeneratorController := controllers.NewGeneratePdfController(userRepository, carbonElectricRepo, carbonSummaryRepository, carbonFuelRepository)
+	ps := e.Group("/generate-pdf-summary")
+	ps.Use(middlewares.CheckAuth)
+	ps.POST("", pdfGeneratorController.PdfHandlerSummary)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 }
